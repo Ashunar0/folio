@@ -1,4 +1,4 @@
-import { MeSidebar } from "@/components/me/me-sidebar";
+import { MeSidebar } from "@/components/sidebar/me-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 

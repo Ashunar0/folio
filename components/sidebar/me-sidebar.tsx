@@ -2,11 +2,6 @@
 
 import { useMemo } from "react";
 import {
-  IconDashboard,
-  IconFileDescription,
-  IconList,
-  IconListDetails,
-  IconUsers,
   IconUser,
   IconKey,
   IconPalette,
@@ -16,11 +11,9 @@ import {
 import { ChevronLeft } from "lucide-react";
 
 import { NavGroup } from "@/components/sidebar/nav-group";
-import { NavUser } from "@/components/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/providers/auth-provider";
@@ -50,12 +43,6 @@ export const meSidebarItems = [
     url: "/me/notifications",
     icon: IconBell,
   },
-  {
-    title: "Danger Zone",
-    url: "/me/danger",
-    icon: IconAlertTriangle,
-    variant: "danger", // 赤いスタイルにしたい時
-  },
 ];
 
 export function MeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -78,13 +65,6 @@ export function MeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       return data;
     },
   });
-
-  const displayUser = {
-    name: profileData?.name || user?.user_metadata?.full_name || "",
-    email: profileData?.email || user?.email || "",
-    avatar:
-      profileData?.avatar_url || user?.user_metadata?.avatar_url || undefined,
-  };
 
   const fallbackPath = useMemo(() => {
     const basePath = teamId ? `/${teamId}/dashboard` : "/";

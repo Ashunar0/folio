@@ -9,6 +9,8 @@ import {
   IconUsers,
   IconCheck,
   IconSettingsCog,
+  IconCategory,
+  IconCalendar,
 } from "@tabler/icons-react";
 
 import { NavGroup } from "@/components/sidebar/nav-group";
@@ -55,6 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const fallbackItems = useMemo(() => {
     const basePath = teamId ? `/${teamId}` : "/";
+    const path = (segment: string) => `${basePath}/${segment}`;
     const isManagerOrAdmin =
       currentTeamRole === "admin" || currentTeamRole === "manager";
 
@@ -62,36 +65,46 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       general: [
         {
           title: "Dashboard",
-          url: `${basePath}/dashboard`,
+          url: path("dashboard"),
           icon: IconDashboard,
         },
         {
           title: "Expense Form",
-          url: `${basePath}/expense-form`,
+          url: path("expense-form"),
           icon: IconFileDescription,
         },
         {
           title: "Expense List",
-          url: `${basePath}/expense-list`,
+          url: path("expense-list"),
           icon: IconListDetails,
         },
         {
           title: "Transactions",
-          url: `${basePath}/transactions`,
+          url: path("transactions"),
           icon: IconList,
         },
-        { title: "Users", url: `${basePath}/users`, icon: IconUsers },
+        { title: "Users", url: path("users"), icon: IconUsers },
       ],
       management: isManagerOrAdmin
         ? [
             {
               title: "Approval",
-              url: `${basePath}/approval`,
+              url: path("approval"),
               icon: IconCheck,
             },
             {
+              title: "Categories",
+              url: path("categories"),
+              icon: IconCategory,
+            },
+            {
+              title: "Events",
+              url: path("events"),
+              icon: IconCalendar,
+            },
+            {
               title: "Team Settings",
-              url: `${basePath}/settings`,
+              url: path("settings"),
               icon: IconSettingsCog,
             },
           ]
