@@ -1,0 +1,94 @@
+"use client";
+
+import { DataTable } from "@/components/data-table";
+import { columns } from "./columns";
+import { Transaction } from "@/lib/schemas";
+import { useTransactions } from "@/lib/api/transactions";
+import { useAuth } from "@/providers/auth-provider";
+import { useTeam } from "@/providers/team-provider";
+import { TransactionSheet } from "@/components/sheets/transaction-sheet";
+import { useState } from "react";
+
+export default function TransactionsClient() {
+  const { authLoading, user } = useAuth();
+  const { teamId, loadingTeams, currentTeamRole } = useTeam();
+  const { data, isLoading, error } = useTransactions();
+
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleRowClick = (row: Transaction) => {
+    setIsEditMode(false);
+    setSelectedTransaction(row);
+    setIsSheetOpen(true);
+  };
+
+  const handleView = (row: Transaction) => {
+    setIsEditMode(false);
+    setSelectedTransaction(row);
+    setIsSheetOpen(true);
+  };
+
+  const handleEdit = (row: Transaction) => {
+    const canEdit =
+      ["admin", "manager"].includes(currentTeamRole ?? "") ||
+      row.createdBy === user?.id;
+
+    if (canEdit) {
+      setIsEditMode(true);
+    } else {
+      setIsEditMode(false);
+    }
+    setSelectedTransaction(row);
+    setIsSheetOpen(true);
+  };
+
+  return (
+    <div>
+      <div className="mb-8">
+        <h1 className="text-xl font-bold tracking-tight">Transaction List</h1>
+        <p className="text-muted-foreground mt-2">
+          View and manage your transactions.
+        </p>
+      </div>
+      {(authLoading || loadingTeams || isLoading) && (
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      )}
+      {error && (
+        <p className="text-sm text-red-600">
+          Failed to load transactions: {error.message}
+        </p>
+      )}
+      {!teamId && !loadingTeams && (
+        <p className="text-sm text-muted-foreground">
+          No team selected. Join or create a team.
+        </p>
+      )}
+      <DataTable
+        data={data ?? []}
+        columns={columns}
+        onRowClick={handleRowClick}
+        meta={{
+          onView: handleView,
+          onEdit: handleEdit,
+          currentUserId: user?.id,
+          canManageAll: ["admin", "manager"].includes(currentTeamRole ?? ""),
+        }}
+      />
+      <TransactionSheet
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        transaction={selectedTransaction}
+        defaultEditMode={isEditMode}
+        canEdit={
+          selectedTransaction
+            ? ["admin", "manager"].includes(currentTeamRole ?? "") ||
+              selectedTransaction.createdBy === user?.id
+            : false
+        }
+      />
+    </div>
+  );
+}

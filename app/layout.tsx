@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Noto_Sans_JP } from "next/font/google";
 import "@/styles/globals.css";
+import { AppProviders } from "@/providers/app-provider";
+import { SupabaseProvider } from "@/providers/supabase-provider";
+import { AuthProvider } from "@/providers/auth-provider";
+import { TeamProvider } from "@/providers/team-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,13 +38,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const defaultTeamId =
+    process.env.NEXT_PUBLIC_SUPABASE_DEFAULT_TEAM_ID ?? null;
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${notoSansJP.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
+        <AppProviders>
+          <SupabaseProvider>
+            <AuthProvider>
+              <TeamProvider defaultTeamId={defaultTeamId}>
+                {children}
+              </TeamProvider>
+            </AuthProvider>
+          </SupabaseProvider>
+        </AppProviders>
       </body>
     </html>
   );
