@@ -1,19 +1,16 @@
 "use client";
 
-import * as React from "react";
+import { useMemo } from "react";
 import {
   IconDashboard,
   IconFileDescription,
   IconList,
   IconListDetails,
-  IconSettings,
-  IconReport,
   IconUsers,
   IconCheck,
   IconSettingsCog,
 } from "@tabler/icons-react";
 
-import { NavSecondary } from "./nav-secondary";
 import { NavGroup } from "@/components/sidebar/nav-group";
 import { NavUser } from "@/components/sidebar/nav-user";
 import {
@@ -26,64 +23,12 @@ import { TeamSwitcher } from "./team-switcher";
 import { useAuth } from "@/providers/auth-provider";
 import { useSupabase } from "@/providers/supabase-provider";
 import { useQuery } from "@tanstack/react-query";
-
-const data = {
-  main: [
-    {
-      title: "Dashboard",
-      url: "/main/dashboard",
-      icon: IconDashboard,
-    },
-    {
-      title: "Expense Form",
-      url: "/main/expense-form",
-      icon: IconFileDescription,
-    },
-    {
-      title: "Expense List",
-      url: "/main/expense-list",
-      icon: IconListDetails,
-    },
-    {
-      title: "Transactions",
-      url: "/main/transactions",
-      icon: IconList,
-    },
-  ],
-  management: [
-    {
-      title: "Approval",
-      url: "/management/approval",
-      icon: IconCheck,
-    },
-    {
-      title: "Users",
-      url: "/management/users",
-      icon: IconUsers,
-    },
-    {
-      title: "Team Settings",
-      url: "/management/team-settings",
-      icon: IconSettingsCog,
-    },
-  ],
-  other: [
-    {
-      title: "Settings",
-      url: "/other/settings",
-      icon: IconSettings,
-    },
-    {
-      title: "Report",
-      url: "/other/report",
-      icon: IconReport,
-    },
-  ],
-};
+import { useTeam } from "@/providers/team-provider";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const supabase = useSupabase();
   const { user } = useAuth();
+  const { teamId, currentTeamRole } = useTeam();
 
   const { data: profileData } = useQuery({
     queryKey: ["sidebar-profile", user?.id],
@@ -108,17 +53,71 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       profileData?.avatar_url || user?.user_metadata?.avatar_url || undefined,
   };
 
+  const fallbackItems = useMemo(() => {
+    const basePath = teamId ? `/${teamId}` : "/";
+    const isManagerOrAdmin =
+      currentTeamRole === "admin" || currentTeamRole === "manager";
+
+    return {
+      general: [
+        {
+          title: "Dashboard",
+          url: `${basePath}`,
+          icon: IconDashboard,
+        },
+        {
+          title: "Expense Form",
+          url: `${basePath}/expense-form`,
+          icon: IconFileDescription,
+        },
+        {
+          title: "Expense List",
+          url: `${basePath}/expense-list`,
+          icon: IconListDetails,
+        },
+        {
+          title: "Transactions",
+          url: `${basePath}/transactions`,
+          icon: IconList,
+        },
+        { title: "Users", url: `${basePath}/users`, icon: IconUsers },
+      ],
+      management: isManagerOrAdmin
+        ? [
+            {
+              title: "Approval",
+              url: `${basePath}/approval`,
+              icon: IconCheck,
+            },
+            {
+              title: "Team Settings",
+              url: `${basePath}/settings`,
+              icon: IconSettingsCog,
+            },
+          ]
+        : [],
+    };
+  }, [teamId, currentTeamRole]);
+
+  const items = {
+    general: fallbackItems.general ?? [],
+    management: fallbackItems.management ?? [],
+  };
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavGroup label="Main" items={data.main} />
-        <NavGroup label="Management" items={data.management} />
+        {items.general.length > 0 && (
+          <NavGroup label="General" items={items.general} />
+        )}
+        {items.management.length > 0 && (
+          <NavGroup label="Management" items={items.management} />
+        )}
       </SidebarContent>
       <SidebarFooter>
-        <NavSecondary items={data.other} />
         {user ? (
           <NavUser user={displayUser} />
         ) : (

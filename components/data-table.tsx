@@ -275,6 +275,10 @@ export function DataTable<TData extends object>({
   onRowClick,
   meta,
 }: DataTableProps<TData>) {
+  // Delay rendering until after mount to keep Radix Tabs ids in sync between SSR/CSR.
+  const [hydrated, setHydrated] = React.useState(false);
+  React.useEffect(() => setHydrated(true), []);
+
   const data = React.useMemo(() => initialData, [initialData]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -319,6 +323,10 @@ export function DataTable<TData extends object>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
+  if (!hydrated) {
+    return <div className="w-full h-[240px] rounded-lg border bg-muted/20" />;
+  }
 
   return (
     <Tabs
