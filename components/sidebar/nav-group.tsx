@@ -12,21 +12,20 @@ import {
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-export function NavGroup({
-  items,
-  label,
-}: {
-  label: string;
+interface NavGroupProps {
+  label?: string;
   items: {
     title: string;
     url: string;
     icon: Icon;
   }[];
-}) {
+}
+
+export function NavGroup({ label, items }: NavGroupProps) {
   const pathname = usePathname();
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>

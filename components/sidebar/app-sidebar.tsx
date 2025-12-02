@@ -62,7 +62,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       general: [
         {
           title: "Dashboard",
-          url: `${basePath}`,
+          url: `${basePath}/dashboard`,
           icon: IconDashboard,
         },
         {

@@ -27,6 +27,15 @@ export function SiteHeader() {
       .join(" ");
   };
 
+  const topCrumbLabel = segments.some((segment) =>
+    ["approval", "settings"].includes(segment.toLowerCase())
+  )
+    ? "Management"
+    : "General";
+
+  const lastSegment = segments[segments.length - 1];
+  const lastCrumbLabel = formatSegment(lastSegment);
+
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b">
       <div className="flex items-center gap-2 px-3">
@@ -35,13 +44,11 @@ export function SiteHeader() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbPage>{formatSegment(segments[0])}</BreadcrumbPage>
+              <BreadcrumbPage>{topCrumbLabel}</BreadcrumbPage>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem>
-              <BreadcrumbPage>
-                {formatSegment(segments[segments.length - 1])}
-              </BreadcrumbPage>
+              <BreadcrumbPage>{lastCrumbLabel}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
