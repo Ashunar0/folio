@@ -52,6 +52,27 @@ export type Transaction = z.infer<typeof transactionSchema>;
 // FormValues型エイリアス（互換性のため）
 export type TransactionFormValues = Transaction;
 
+// --- Category ---
+export const categorySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  teamId: z.string().nullable(),
+  createdAt: z.string().optional(),
+});
+
+export type Category = z.infer<typeof categorySchema>;
+
+// --- Event ---
+export const eventSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  date: z.string().nullable().optional(),
+  teamId: z.string(),
+  createdAt: z.string().optional(),
+});
+
+export type EventItem = z.infer<typeof eventSchema>;
+
 // --- User ---
 export const userSchema = z.object({
   id: z.string(),
