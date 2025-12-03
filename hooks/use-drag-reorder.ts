@@ -4,7 +4,11 @@ import { useRef, type Dispatch, type SetStateAction } from "react";
 
 type SetItems<T> = Dispatch<SetStateAction<T[]>>;
 
-export function useDragReorder<T>(_items: T[], setItems: SetItems<T>) {
+export function useDragReorder<T>(
+  _items: T[],
+  setItems: SetItems<T>,
+  options?: { onReorder?: (items: T[]) => void }
+) {
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
 
@@ -43,6 +47,7 @@ export function useDragReorder<T>(_items: T[], setItems: SetItems<T>) {
       const next = [...prev];
       const [moved] = next.splice(from, 1);
       next.splice(to, 0, moved);
+      options?.onReorder?.(next);
       return next;
     });
 

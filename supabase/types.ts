@@ -21,21 +21,27 @@ export type Database = {
           created_by: string;
           id: string;
           name: string;
+          sort_order: number;
           team_id: string | null;
+          type: string;
         };
         Insert: {
           created_at?: string;
           created_by: string;
           id?: string;
           name: string;
+          sort_order?: number;
           team_id?: string | null;
+          type?: string;
         };
         Update: {
           created_at?: string;
           created_by?: string;
           id?: string;
           name?: string;
+          sort_order?: number;
           team_id?: string | null;
+          type?: string;
         };
         Relationships: [
           {

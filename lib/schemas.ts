@@ -59,6 +59,7 @@ export const categorySchema = z.object({
   teamId: z.string().nullable(),
   createdAt: z.string().optional(),
   type: z.enum(["expense", "income"]).optional(),
+  sortOrder: z.number().optional(),
 });
 
 export type Category = z.infer<typeof categorySchema>;

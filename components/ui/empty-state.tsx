@@ -7,25 +7,23 @@ import {
 } from "@/components/ui/empty";
 import { Inbox } from "lucide-react";
 
+type EmptyStateProps = {
+  icon?: React.ReactNode;
+  title?: string;
+  description?: string;
+};
+
 export function EmptyState({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
+  icon = <Inbox />,
+  title = "",
+  description = "",
+}: EmptyStateProps) {
   return (
     <Empty>
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Inbox />
-        </EmptyMedia>
-        <EmptyTitle>Nothing here yet</EmptyTitle>
-        <EmptyDescription>
-          Get started by creating your first item.
-        </EmptyDescription>
+        <EmptyMedia variant="icon">{icon}</EmptyMedia>
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

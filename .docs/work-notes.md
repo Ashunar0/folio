@@ -16,3 +16,13 @@
   - Categories (`app/(app)/[teamId]/categories/client.tsx`) and Events (`app/(app)/[teamId]/events/client.tsx`) now render live data with add, edit, delete, refresh, and drag-reorder using shared `use-drag-reorder` hook.
 - Expense form categories:
   - Category select now reads from Supabase categories and filters by type (expense/income) based on the selected expense type; clears invalid selections when switching types.
+- Categories UI split for expense/income:
+  - `app/(app)/[teamId]/categories/client.tsx` now has separate cards for expense and income categories with independent add forms; drag-reorder persists via `useReorderCategories` (team-owned items only). Shared categories remain read-only.
+  - `use-drag-reorder` supports optional `onReorder` callback to persist ordering.
+- Categories schema update:
+  - Added `type` and `sort_order` to `categories` via migration `0002_categories_type_sort.sql`, backfilling existing rows and indexing for order; seeds updated with type/order including a sample income category.
+  - Reorder persistence now upserts id/team_id/name/type/sort_order to satisfy NOT NULL columns and avoid empty result errors.
+- Categories fetch fallback:
+  - `useCategories` now falls back to simple ordering if `sort_order/type` columns are missing (pre-migration DB), preventing 400 errors; reorder mutation warns clearly when sort_order column is absent.
+- Reorder reliability:
+  - `useReorderCategories` now throws clearer errors, coerces type/sort defaults, uses upsert with select to surface DB errors, and logging prints the actual message.

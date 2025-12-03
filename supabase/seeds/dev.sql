@@ -33,11 +33,12 @@ values
 on conflict (team_id, user_id) do nothing;
 
 -- Categories (team-specific + shared)
-insert into categories (id, team_id, name, created_by)
+insert into categories (id, team_id, name, created_by, type, sort_order)
 values
-  ('11111111-aaaa-4f00-8000-000000000001', null, '交通費', 'd9b79ea3-6c4b-462c-a35b-d857f956aab7'),
-  ('11111111-aaaa-4f00-8000-000000000002', null, '宿泊費', 'd9b79ea3-6c4b-462c-a35b-d857f956aab7'),
-  ('11111111-aaaa-4f00-8000-000000000003', 'a7ec413d-4e38-4d6e-8063-86f818569738', 'チーム独自カテゴリ', 'd9b79ea3-6c4b-462c-a35b-d857f956aab7')
+  ('11111111-aaaa-4f00-8000-000000000001', null, '交通費', 'd9b79ea3-6c4b-462c-a35b-d857f956aab7', 'expense', 0),
+  ('11111111-aaaa-4f00-8000-000000000002', null, '宿泊費', 'd9b79ea3-6c4b-462c-a35b-d857f956aab7', 'expense', 1),
+  ('11111111-aaaa-4f00-8000-000000000003', 'a7ec413d-4e38-4d6e-8063-86f818569738', 'チーム独自カテゴリ', 'd9b79ea3-6c4b-462c-a35b-d857f956aab7', 'expense', 2),
+  ('11111111-aaaa-4f00-8000-000000000004', 'a7ec413d-4e38-4d6e-8063-86f818569738', '広告収入', 'd9b79ea3-6c4b-462c-a35b-d857f956aab7', 'income', 0)
 on conflict (id) do nothing;
 
 -- Events
