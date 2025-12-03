@@ -61,10 +61,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { RoleBadge } from "@/components/role-badge";
 import { User } from "@/lib/schemas";
 import { userTestData } from "@/lib/testData";
+import { useDragReorder } from "@/hooks/use-drag-reorder";
 
 export default function TeamSettingsClient() {
   // Mock Data
@@ -200,75 +201,23 @@ export default function TeamSettingsClient() {
     setSelectedMember(null);
   };
 
-  // Drag and Drop Logic for Categories
-  const dragCategoryItem = useRef<number | null>(null);
-  const dragOverCategoryItem = useRef<number | null>(null);
+  const {
+    handleDragStart: handleCategoryDragStart,
+    handleDragEnter: handleCategoryDragEnter,
+    handleDragEnd: handleCategoryDragEnd,
+  } = useDragReorder(expenseCategories, setExpenseCategories);
 
-  const handleCategoryDragStart = (index: number) => {
-    dragCategoryItem.current = index;
-  };
-
-  const handleCategoryDragEnter = (index: number) => {
-    dragOverCategoryItem.current = index;
-  };
-
-  const handleCategoryDragEnd = () => {
-    const dragIndex = dragCategoryItem.current;
-    const dragOverIndex = dragOverCategoryItem.current;
-
-    if (
-      dragIndex !== null &&
-      dragOverIndex !== null &&
-      dragIndex !== dragOverIndex
-    ) {
-      const _expenseCategories = [...expenseCategories];
-      const draggedItemContent = _expenseCategories[dragIndex];
-      _expenseCategories.splice(dragIndex, 1);
-      _expenseCategories.splice(dragOverIndex, 0, draggedItemContent);
-      setExpenseCategories(_expenseCategories);
-    }
-
-    dragCategoryItem.current = null;
-    dragOverCategoryItem.current = null;
-  };
-
-  // Drag and Drop Logic for Events
-  const dragEventItem = useRef<number | null>(null);
-  const dragOverEventItem = useRef<number | null>(null);
-
-  const handleEventDragStart = (index: number) => {
-    dragEventItem.current = index;
-  };
-
-  const handleEventDragEnter = (index: number) => {
-    dragOverEventItem.current = index;
-  };
-
-  const handleEventDragEnd = () => {
-    const dragIndex = dragEventItem.current;
-    const dragOverIndex = dragOverEventItem.current;
-
-    if (
-      dragIndex !== null &&
-      dragOverIndex !== null &&
-      dragIndex !== dragOverIndex
-    ) {
-      const _events = [...events];
-      const draggedItemContent = _events[dragIndex];
-      _events.splice(dragIndex, 1);
-      _events.splice(dragOverIndex, 0, draggedItemContent);
-      setEvents(_events);
-    }
-
-    dragEventItem.current = null;
-    dragOverEventItem.current = null;
-  };
+  const {
+    handleDragStart: handleEventDragStart,
+    handleDragEnter: handleEventDragEnter,
+    handleDragEnd: handleEventDragEnd,
+  } = useDragReorder(events, setEvents);
 
   return (
     <div className="w-full max-w-3xl space-y-10 py-8 mx-auto">
-      <h1 className="text-3xl font-bold">Team Settings</h1>
+      <h1 className="text-xl font-bold tracking-tight">Team Settings</h1>
 
-      {/* Section 1: General */}
+      {/* General */}
       <section className="space-y-4">
         <h2 className="text-lg flex items-center gap-2">
           <Settings size={18} />
@@ -430,162 +379,6 @@ export default function TeamSettingsClient() {
                 </div>
               </div>
               <Switch defaultChecked={false} />
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Section 3: Category Management */}
-      <section className="space-y-4">
-        <h2 className="text-lg flex items-center gap-2">
-          <List size={18} />
-          Category Management
-        </h2>
-        <Card className="py-0 rounded-md">
-          <CardContent className="p-6 space-y-6">
-            {/* Expense Categories */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Expense Categories</h3>
-                <Button variant="outline" size="sm" className="h-8">
-                  <Plus className="mr-2 h-3 w-3" />
-                  Add
-                </Button>
-              </div>
-              <div className="border rounded-md divide-y">
-                {expenseCategories.map((category, index) => (
-                  <div
-                    key={category.id}
-                    className="flex items-center justify-between p-3 hover:bg-muted/50 group cursor-move"
-                    draggable
-                    onDragStart={() => handleCategoryDragStart(index)}
-                    onDragEnter={() => handleCategoryDragEnter(index)}
-                    onDragEnd={handleCategoryDragEnd}
-                    onDragOver={(e) => e.preventDefault()}
-                  >
-                    <div className="flex items-center gap-3 pointer-events-none">
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{category.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-red-600 hover:text-red-600 hover:bg-red-50"
-                      >
-                        <Trash className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-end">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Reset to defaults
-                </Button>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Income Categories (Mock) */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Income Categories</h3>
-                <Button variant="outline" size="sm" className="h-8">
-                  <Plus className="mr-2 h-3 w-3" />
-                  Add
-                </Button>
-              </div>
-              <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-md text-center border border-dashed">
-                No income categories configured.
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Section 4: Event Management */}
-      <section className="space-y-4">
-        <h2 className="text-lg flex items-center gap-2">
-          <Calendar size={18} />
-          Event Management
-        </h2>
-        <Card className="py-0 rounded-md">
-          <CardContent className="p-6 space-y-6">
-            {/* Input Mode */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Event Input Mode</Label>
-              <RadioGroup defaultValue="select" className="flex gap-6">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="select" id="r1" />
-                  <Label
-                    htmlFor="r1"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    Select from Master
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="free" id="r2" />
-                  <Label
-                    htmlFor="r2"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    Free Input
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <Separator />
-
-            {/* Event List */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Event Master</h3>
-                <Button variant="outline" size="sm" className="h-8">
-                  <Plus className="mr-2 h-3 w-3" />
-                  Add
-                </Button>
-              </div>
-              <div className="border rounded-md divide-y">
-                {events.map((event, index) => (
-                  <div
-                    key={event.id}
-                    className="flex items-center justify-between p-3 hover:bg-muted/50 group cursor-move"
-                    draggable
-                    onDragStart={() => handleEventDragStart(index)}
-                    onDragEnter={() => handleEventDragEnter(index)}
-                    onDragEnd={handleEventDragEnd}
-                    onDragOver={(e) => e.preventDefault()}
-                  >
-                    <div className="flex items-center gap-3 pointer-events-none">
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{event.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-red-600 hover:text-red-600 hover:bg-red-50"
-                      >
-                        <Trash className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </CardContent>
         </Card>
