@@ -23,8 +23,10 @@ export async function uploadReceipt({
     {
       cacheControl: "3600",
       upsert: false,
+      contentType: file.type || undefined,
       metadata: {
         team_id: teamId,
+        user_id: userId,
       },
     }
   );

@@ -23,8 +23,8 @@
 
 - テーブル: profiles / teams / team_users / categories / events / expenses / transactions / invites。
 - RLS: team_id スコープ、role で UPDATE/DELETE 制限。approved は編集不可（サーバー側）。
-- Storage: バケット `receipts`。UI は `team_id/authUid/uuid.ext` + metadata `team_id` でアップロード。
-- Storage RLS: receipts は team_id メタデータ必須。パス prefix を `team_id/auth.uid()/...` に強制（admin/manager は全パス可、それ以外は自分のパスのみ）。
+- Storage: バケット `receipts`。UI は `team_id/authUid/uuid.ext` でアップロードし、`uploadReceipt` が `contentType` と metadata（team_id/user_id）も付与。
+- Storage RLS: 0004 で path ベースに一本化（`<team_id>/<user_id>/...` が必須）。metadata 無しでも動作するが、パスの team 所属チェック + admin/manager の override 以外は自分の prefix のみ。
 - フォーム: ExpenseForm/ExpenseSheet は Supabase へ保存・更新を実行（カテゴリ/イベントは名称から ID 解決して挿入、権限チェックあり）。UserSheet はロール変更を Supabase に反映、失敗時はメッセージ表示。
 - 承認 UX: approve/reject 後に approvals/expenses/transactions を invalidate し、トーストでフィードバック。
 - エラー表示: 一覧エラーは `DestructiveAlert` に統一。承認トーストは alert-toast UI で単一表示。

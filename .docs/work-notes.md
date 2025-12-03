@@ -26,3 +26,6 @@
   - `useCategories` now falls back to simple ordering if `sort_order/type` columns are missing (pre-migration DB), preventing 400 errors; reorder mutation warns clearly when sort_order column is absent.
 - Reorder reliability:
   - `useReorderCategories` now throws clearer errors, coerces type/sort defaults, uses upsert with select to surface DB errors, and logging prints the actual message.
+- Receipts upload RLS:
+  - Added migration `0004_receipts_rls_path_only.sql` to allow storage writes based on path prefix `<team_id>/<user_id>/...` without requiring metadata; still scoped to team membership and role override.
+  - `uploadReceipt` includes metadata and contentType; policy now works even if metadata is omitted.
