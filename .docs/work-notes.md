@@ -29,3 +29,7 @@
 - Receipts upload RLS:
   - Added migration `0004_receipts_rls_path_only.sql` to allow storage writes based on path prefix `<team_id>/<user_id>/...` without requiring metadata; still scoped to team membership and role override.
   - `uploadReceipt` includes metadata and contentType; policy now works even if metadata is omitted.
+- Receipts RLS applied:
+  - Linked project `rnatvptcbafxeznvqzcg`, repaired migration history (remote-only entries marked reverted; local duplicates renumbered to 0005–0007), and pushed `0007_receipts_rls_path_only.sql`. Local migrations now 0001–0007 aligned with remote.
+- Receipt preview UI:
+  - Expense list/approval list: Receipt icon now opens a dialog showing the uploaded image via Supabase signed URL (10 min). Loading uses `Spinner`, errors surfaced; click is stopPropagation-safe so row click behavior is unchanged. Paths and previews are displayed up to 75vh with containment styling.

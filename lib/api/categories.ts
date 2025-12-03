@@ -73,7 +73,11 @@ export function useCategories() {
         if (error) {
           const msg = (error as any)?.message ?? "";
           const code = (error as any)?.code ?? "";
-          if (code === "42703" || msg.includes("sort_order") || msg.includes("type")) {
+          if (
+            code === "42703" ||
+            msg.includes("sort_order") ||
+            msg.includes("type")
+          ) {
             return fetchWithoutSort();
           }
           throw error;
@@ -118,7 +122,7 @@ export function useCreateCategory() {
       if (error) throw error;
       return mapCategory(data);
     },
-    onSuccess: (_data, _variables, _context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories", teamId] });
     },
   });
@@ -155,7 +159,7 @@ export function useUpdateCategory() {
       if (error) throw error;
       return mapCategory(data);
     },
-    onSuccess: (_data, _variables, _context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories", teamId] });
     },
   });
@@ -225,7 +229,7 @@ export function useReorderCategories() {
         throw err;
       }
     },
-    onSuccess: (_data, _variables, _context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories", teamId] });
     },
     onError: (error) => {

@@ -95,7 +95,7 @@ export function TransactionSheet({
         if (!isNaN(dateObj.getTime())) {
           formattedDate = dateObj.toISOString().split("T")[0];
         }
-      } catch (e) {
+      } catch (err) {
         console.error("Invalid date format:", transaction.date);
       }
 

@@ -174,9 +174,7 @@ export function ExpenseSheet({
               )}
           </div>
 
-          {saveError && (
-            <div className="text-sm text-red-600">{saveError}</div>
-          )}
+          {saveError && <div className="text-sm text-red-600">{saveError}</div>}
 
           <Form {...form}>
             <form id="expense-form" className="grid gap-4">
@@ -295,7 +293,7 @@ export function ExpenseSheet({
                     <FormItem>
                       <FormLabel>Status</FormLabel>
                       <div className="text-sm pt-1 font-medium">
-                        {statusMap[field.value] || field.value}
+                        {statusMap[field.value ?? ""] || field.value}
                       </div>
                       <input type="hidden" {...form.register("status")} />
                       <FormMessage />

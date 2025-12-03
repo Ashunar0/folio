@@ -22,7 +22,7 @@ import { useTeam } from "@/providers/team-provider";
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar();
-  const { teams, teamId, setTeamId, loadingTeams, currentTeamRole } = useTeam();
+  const { teams, teamId, setTeamId, currentTeamRole } = useTeam();
   const [lastActiveTeam, setLastActiveTeam] = React.useState<{
     id: string;
     name: string;
@@ -46,7 +46,11 @@ export function TeamSwitcher() {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" className="opacity-60 cursor-default" disabled>
+          <SidebarMenuButton
+            size="lg"
+            className="opacity-60 cursor-default"
+            disabled
+          >
             <div className="bg-muted text-muted-foreground flex aspect-square size-8 items-center justify-center rounded-lg text-sm font-semibold">
               ?
             </div>

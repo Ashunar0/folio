@@ -41,11 +41,12 @@ export function useEvents() {
     enabled: Boolean(teamId),
     queryFn: async () => {
       assertTeamSelected(teamId);
+      const currentTeamId = teamId!;
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .eq("team_id", teamId)
-        .order("date", { ascending: true, nullsLast: true })
+        .eq("team_id", currentTeamId)
+        .order("date", { ascending: true, nullsFirst: false })
         .order("created_at", { ascending: true });
 
       if (error) throw error;
@@ -84,7 +85,7 @@ export function useCreateEvent() {
       if (error) throw error;
       return mapEvent(data);
     },
-    onSuccess: (_data, _variables, _context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events", teamId] });
     },
   });
@@ -118,7 +119,7 @@ export function useUpdateEvent() {
       if (error) throw error;
       return mapEvent(data);
     },
-    onSuccess: (_data, _variables, _context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events", teamId] });
     },
   });

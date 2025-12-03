@@ -11,7 +11,6 @@ import { RoleBadge } from "@/components/role-badge";
 import { useTeams } from "@/providers/team-provider";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FieldSeparator } from "@/components/ui/field";
 
 export function SelectTeamForm({
   className,

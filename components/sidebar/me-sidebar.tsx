@@ -1,13 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  IconUser,
-  IconKey,
-  IconPalette,
-  IconBell,
-  IconAlertTriangle,
-} from "@tabler/icons-react";
+import { IconUser, IconKey, IconPalette, IconBell } from "@tabler/icons-react";
 import { ChevronLeft } from "lucide-react";
 
 import { NavGroup } from "@/components/sidebar/nav-group";
@@ -17,8 +11,6 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/providers/auth-provider";
-import { useSupabase } from "@/providers/supabase-provider";
-import { useQuery } from "@tanstack/react-query";
 import { useTeam } from "@/providers/team-provider";
 import Link from "next/link";
 
@@ -46,25 +38,7 @@ export const meSidebarItems = [
 ];
 
 export function MeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const supabase = useSupabase();
-  const { user } = useAuth();
-  const { teamId, currentTeamRole } = useTeam();
-
-  const { data: profileData } = useQuery({
-    queryKey: ["sidebar-profile", user?.id],
-    enabled: Boolean(user?.id),
-    placeholderData: (prev) => prev,
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("name, email, avatar_url")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { teamId } = useTeam();
 
   const fallbackPath = useMemo(() => {
     const basePath = teamId ? `/${teamId}/dashboard` : "/";

@@ -9,15 +9,30 @@ import { useTeam } from "@/providers/team-provider";
 import { ExpenseSheet } from "@/components/sheets/expense-sheet";
 import { useState } from "react";
 import { DestructiveAlert } from "@/components/ui/alert-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useSupabase } from "@/providers/supabase-provider";
+import { Spinner } from "@/components/ui/spinner";
+import Image from "next/image";
 
 export default function ExpenseListClient() {
   const { authLoading, user } = useAuth();
   const { teamId, loadingTeams, currentTeamRole } = useTeam();
   const { data, isLoading, error } = useExpenses();
+  const supabase = useSupabase();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  const [receiptPath, setReceiptPath] = useState<string | null>(null);
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [isReceiptLoading, setIsReceiptLoading] = useState(false);
 
   const handleRowClick = (row: Expense) => {
     setIsEditMode(false);
@@ -43,6 +58,26 @@ export default function ExpenseListClient() {
     }
     setSelectedExpense(row);
     setIsSheetOpen(true);
+  };
+
+  const handleReceiptPreview = async (path: string) => {
+    setIsReceiptOpen(true);
+    setReceiptPath(path);
+    setReceiptUrl(null);
+    setReceiptError(null);
+    setIsReceiptLoading(true);
+
+    const { data, error: signedError } = await supabase.storage
+      .from("receipts")
+      .createSignedUrl(path, 60 * 10);
+
+    if (signedError) {
+      setReceiptError(signedError.message);
+      setReceiptUrl(null);
+    } else {
+      setReceiptUrl(data?.signedUrl ?? null);
+    }
+    setIsReceiptLoading(false);
   };
 
   return (
@@ -76,6 +111,7 @@ export default function ExpenseListClient() {
           onEdit: handleEdit,
           currentUserId: user?.id,
           canManageAll: ["admin", "manager"].includes(currentTeamRole ?? ""),
+          onReceiptPreview: handleReceiptPreview,
         }}
       />
       <ExpenseSheet
@@ -92,6 +128,47 @@ export default function ExpenseListClient() {
             : false
         }
       />
+      <Dialog
+        open={isReceiptOpen}
+        onOpenChange={(open) => {
+          setIsReceiptOpen(open);
+          if (!open) {
+            setReceiptPath(null);
+            setReceiptUrl(null);
+            setReceiptError(null);
+            setIsReceiptLoading(false);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>領収書</DialogTitle>
+          </DialogHeader>
+          {isReceiptLoading && (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <Spinner />
+              <span>Loading...</span>
+            </div>
+          )}
+          {receiptError && (
+            <p className="text-sm text-destructive">{receiptError}</p>
+          )}
+          {!isReceiptLoading && !receiptError && receiptUrl && (
+            <div className="flex justify-center">
+              <Image
+                src={receiptUrl}
+                alt="Receipt preview"
+                className="h-auto max-h-[75vh] w-auto max-w-full rounded-md border object-contain"
+              />
+            </div>
+          )}
+          {!isReceiptLoading && !receiptError && !receiptUrl && receiptPath && (
+            <p className="text-sm text-muted-foreground">
+              プレビューを取得できませんでした。
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

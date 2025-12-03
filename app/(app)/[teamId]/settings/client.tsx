@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -13,28 +12,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import {
   AlertTriangle,
-  Calendar,
-  Copy,
   Database,
   Download,
   ExternalLink,
-  GripVertical,
   Link as LinkIcon,
-  List,
-  MoreVertical,
-  Pencil,
-  Plus,
   Settings,
   Shield,
   Trash,
   Upload,
   Users,
   UserPlus,
-  Pen,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -64,8 +54,8 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { RoleBadge } from "@/components/role-badge";
 import { User } from "@/lib/schemas";
-import { userTestData } from "@/lib/testData";
 import { useDragReorder } from "@/hooks/use-drag-reorder";
+import { Switch } from "@/components/ui/switch";
 
 export default function TeamSettingsClient() {
   // Mock Data
@@ -490,7 +480,7 @@ export default function TeamSettingsClient() {
             <Separator />
 
             {/* Role Management (Admin only) */}
-            {userRole === "admin" && (
+            {/* {userRole === "admin" && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -547,7 +537,7 @@ export default function TeamSettingsClient() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {userRole === "admin" && <Separator />}
           </CardContent>

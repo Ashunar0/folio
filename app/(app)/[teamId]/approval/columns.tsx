@@ -112,9 +112,30 @@ export const approvalColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "receiptUrl",
     header: "Receipt",
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const url = row.original.receiptUrl;
-      return url ? <Link2 size={16} className="text-muted-foreground" /> : "ー";
+      const meta = table.options.meta as any;
+      return url ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            meta?.onReceiptPreview?.(url);
+          }}
+        >
+          <Link2 size={16} />
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground disabled hover:bg-transparent"
+        >
+          <span>-</span>
+        </Button>
+      );
     },
   },
 ];

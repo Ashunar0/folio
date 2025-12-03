@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { List, GripVertical, Pencil, Trash } from "lucide-react";
+import { GripVertical, Pencil, Trash } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";

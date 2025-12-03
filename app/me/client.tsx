@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { RoleBadge } from "@/components/role-badge";
 import { User as UserType } from "@/lib/schemas";
-import { cn } from "@/lib/utils";
 import { useState } from "react";
 import {
   Select,
@@ -33,7 +32,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTeam } from "@/providers/team-provider";
 
 export default function ProfileClient() {
   // Mock Data
@@ -115,8 +113,6 @@ export default function ProfileClient() {
     { name: "Rose", color: "#F43F5E" },
     { name: "Slate", color: "#64748B" },
   ];
-
-  const { teamId } = useTeam();
 
   const [selectedTheme, setSelectedTheme] = useState("Neutral");
 
