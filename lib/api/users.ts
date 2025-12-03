@@ -5,7 +5,14 @@ import { User } from "@/lib/schemas";
 import { assertCanManageTeamUser, assertTeamSelected } from "@/lib/permissions";
 import { useAuth } from "@/providers/auth-provider";
 
-function mapUser(row: any): User {
+type TeamUserRow = {
+  user_id: string;
+  role: "admin" | "manager" | "member" | "viewer";
+  created_at: string;
+  profiles?: { name?: string | null; email?: string | null } | null;
+};
+
+function mapUser(row: TeamUserRow): User {
   return {
     id: row.user_id,
     name: row.profiles?.name ?? "",

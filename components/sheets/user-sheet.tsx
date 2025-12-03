@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/form";
 import { IconPencil } from "@tabler/icons-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { User, userSchema } from "@/lib/schemas";
 import { useUpdateUserRole } from "@/lib/api/users";
 
@@ -52,7 +52,7 @@ export function UserSheet({
   const updateUserRole = useUpdateUserRole();
 
   const form = useForm<User>({
-    resolver: zodResolver(userSchema) as any,
+    resolver: zodResolver(userSchema) as Resolver<User>,
     defaultValues: {
       id: "",
       name: "",
@@ -65,9 +65,11 @@ export function UserSheet({
   });
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    const timeout = window.setTimeout(() => {
       setIsEditMode(defaultEditMode && canEdit);
-    }
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [open, defaultEditMode, canEdit]);
 
   useEffect(() => {
@@ -81,8 +83,14 @@ export function UserSheet({
     try {
       await updateUserRole.mutateAsync({ userId: data.id, role: data.role });
       setIsEditMode(false);
-    } catch (err: any) {
-      setSaveError(err.message ?? "保存に失敗しました");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "保存に失敗しました";
+      setSaveError(message);
     }
   };
 

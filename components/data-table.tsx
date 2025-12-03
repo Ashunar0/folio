@@ -68,7 +68,7 @@ type DataTableProps<TData> = {
   data: TData[];
   columns?: ColumnDef<TData, unknown>[];
   onRowClick?: (row: TData) => void;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 };
 
 export function DataTable<TData extends object>({
@@ -94,6 +94,7 @@ export function DataTable<TData extends object>({
     pageSize: 10,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns: columns ?? ([] as ColumnDef<TData, unknown>[]),

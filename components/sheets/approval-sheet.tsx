@@ -24,7 +24,7 @@ import {
 
 import { Expense, expenseSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { useApproveExpense, useRejectExpense } from "@/lib/api/approvals";
 import { useState } from "react";
@@ -62,7 +62,7 @@ export function ApprovalSheet({
   const [actionError, setActionError] = useState<string | null>(null);
 
   const form = useForm<ApprovalFormValues>({
-    resolver: zodResolver(approvalSchema) as any,
+    resolver: zodResolver(approvalSchema) as Resolver<ApprovalFormValues>,
     defaultValues: {
       id: "",
       date: "",
@@ -119,8 +119,14 @@ export function ApprovalSheet({
     try {
       await approveMutation.mutateAsync(expense.id);
       onOpenChange(false);
-    } catch (err: any) {
-      setActionError(err.message ?? "承認に失敗しました");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "承認に失敗しました";
+      setActionError(message);
     }
   };
 
@@ -137,8 +143,14 @@ export function ApprovalSheet({
         comment: data.approvalComment ?? undefined,
       });
       onOpenChange(false);
-    } catch (err: any) {
-      setActionError(err.message ?? "差戻しに失敗しました");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "差戻しに失敗しました";
+      setActionError(message);
     }
   };
 

@@ -33,7 +33,7 @@ import {
 import { Expense, expenseSchema, ExpenseFormValues } from "@/lib/schemas";
 import { IconPencil } from "@tabler/icons-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -72,7 +72,7 @@ export function ExpenseSheet({
   const updateExpense = useUpdateExpense(expense);
 
   const form = useForm<ExpenseFormValues>({
-    resolver: zodResolver(expenseSchema) as any,
+    resolver: zodResolver(expenseSchema) as Resolver<ExpenseFormValues>,
     defaultValues: {
       id: "",
       date: "",
@@ -88,11 +88,12 @@ export function ExpenseSheet({
     },
   });
 
-  // openがtrueになったときにdefaultEditModeを反映
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    const timeout = window.setTimeout(() => {
       setIsEditMode(defaultEditMode && canEdit);
-    }
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [open, defaultEditMode, canEdit]);
 
   // expenseが変わったらformの値を更新
@@ -126,8 +127,14 @@ export function ExpenseSheet({
     try {
       await updateExpense.mutateAsync(data as Expense);
       setIsEditMode(false);
-    } catch (err: any) {
-      setSaveError(err.message ?? "保存に失敗しました");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "保存に失敗しました";
+      setSaveError(message);
     }
   };
 
@@ -151,12 +158,12 @@ export function ExpenseSheet({
         </SheetHeader>
 
         <div className="flex flex-col gap-4 p-4 text-sm">
-          {form.watch("status") === "rejected" &&
-            form.watch("approvalComment") && (
+          {form.getValues("status") === "rejected" &&
+            form.getValues("approvalComment") && (
               <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-md">
                 <div className="font-bold text-xs mb-1">差戻し理由:</div>
                 <div className="text-sm whitespace-pre-wrap">
-                  {form.watch("approvalComment")}
+                  {form.getValues("approvalComment")}
                 </div>
               </div>
             )}

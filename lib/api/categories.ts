@@ -30,13 +30,24 @@ type ReorderCategoryInput = {
   name: string;
 };
 
-function mapCategory(row: any): Category {
+type CategoryRow = {
+  id: string;
+  name: string;
+  team_id: string | null;
+  created_at?: string;
+  type?: string | null;
+  sort_order?: number | null;
+};
+
+function mapCategory(row: CategoryRow): Category {
+  const normalizedType =
+    row.type === "income" ? "income" : row.type === "expense" ? "expense" : undefined;
   return {
     id: row.id,
     name: row.name,
     teamId: row.team_id,
     createdAt: row.created_at,
-    type: row.type ?? "expense",
+    type: normalizedType,
     sortOrder: row.sort_order ?? undefined,
   };
 }
@@ -50,29 +61,27 @@ export function useCategories() {
     enabled: Boolean(teamId),
     queryFn: async () => {
       assertTeamSelected(teamId);
-      const fetchWithSort = async () => {
-        return supabase
+      const fetchWithSort = async () =>
+        supabase
           .from("categories")
           .select("*")
           .or(`team_id.eq.${teamId},team_id.is.null`)
           .order("type", { ascending: true })
           .order("sort_order", { ascending: true, nullsFirst: true })
           .order("created_at", { ascending: true });
-      };
 
-      const fetchWithoutSort = async () => {
-        return supabase
+      const fetchWithoutSort = async () =>
+        supabase
           .from("categories")
           .select("*")
           .or(`team_id.eq.${teamId},team_id.is.null`)
           .order("created_at", { ascending: true });
-      };
 
       const attempt = async () => {
         const { data, error } = await fetchWithSort();
         if (error) {
-          const msg = (error as any)?.message ?? "";
-          const code = (error as any)?.code ?? "";
+          const msg = error?.message ?? "";
+          const code = (error as { code?: string } | null)?.code ?? "";
           if (
             code === "42703" ||
             msg.includes("sort_order") ||
@@ -219,8 +228,8 @@ export function useReorderCategories() {
       const results = await Promise.all(updates);
       const err = results.find((r) => r.error)?.error;
       if (err) {
-        const msg = (err as any)?.message ?? "";
-        const code = (err as any)?.code ?? "";
+        const msg = err?.message ?? "";
+        const code = (err as { code?: string } | null)?.code ?? "";
         if (code === "42703" || msg.includes("sort_order")) {
           throw new Error(
             "並び順を保存するには categories テーブルに sort_order 列が必要です。最新のマイグレーションを適用してください。"
@@ -235,7 +244,7 @@ export function useReorderCategories() {
     onError: (error) => {
       console.error(
         "Failed to reorder categories:",
-        (error as any)?.message ?? error
+        (error as { message?: string } | null)?.message ?? error
       );
     },
   });

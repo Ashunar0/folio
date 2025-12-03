@@ -6,7 +6,24 @@ import { assertCanApprove, assertTeamSelected } from "@/lib/permissions";
 import { toast } from "sonner";
 import { AlertSuccess, DestructiveAlert } from "@/components/ui/alert-toast";
 
-function mapExpense(row: any): Expense {
+type ApprovalExpenseRow = {
+  id: string;
+  date: string;
+  amount: number;
+  type: "expense" | "income";
+  category_id?: string | null;
+  event_id?: string | null;
+  created_by: string;
+  status: "draft" | "submitted" | "approved" | "rejected";
+  memo?: string | null;
+  receipt_url?: string | null;
+  approval_comment?: string | null;
+  categories?: { name?: string | null } | null;
+  events?: { name?: string | null } | null;
+  profiles?: { name?: string | null } | null;
+};
+
+function mapExpense(row: ApprovalExpenseRow): Expense {
   return {
     id: row.id,
     date: row.date,

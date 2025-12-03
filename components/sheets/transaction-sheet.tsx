@@ -37,7 +37,7 @@ import {
 } from "@/lib/schemas";
 import { IconPencil } from "@tabler/icons-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -67,7 +67,7 @@ export function TransactionSheet({
   const [isEditMode, setIsEditMode] = useState(defaultEditMode && canEdit);
 
   const form = useForm<TransactionFormValues>({
-    resolver: zodResolver(transactionSchema) as any,
+    resolver: zodResolver(transactionSchema) as Resolver<TransactionFormValues>,
     defaultValues: {
       id: "",
       date: "",
@@ -82,9 +82,11 @@ export function TransactionSheet({
   });
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    const timeout = window.setTimeout(() => {
       setIsEditMode(defaultEditMode && canEdit);
-    }
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [open, defaultEditMode, canEdit]);
 
   useEffect(() => {

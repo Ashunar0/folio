@@ -22,7 +22,10 @@ export function SelectTeamForm({
 
   useEffect(() => {
     if (teams.length > 0 && !selectedTeamId) {
-      setSelectedTeamId(teams[0].id);
+      const timeout = window.setTimeout(() => {
+        setSelectedTeamId(teams[0].id);
+      }, 0);
+      return () => window.clearTimeout(timeout);
     }
   }, [teams, selectedTeamId]);
 
@@ -58,7 +61,7 @@ export function SelectTeamForm({
                 >
                   <div className="flex items-center gap-4">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={(team as any).icon} alt={team.name} />
+                      <AvatarImage src={undefined} alt={team.name} />
                       <AvatarFallback className="rounded-lg">
                         {team.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>

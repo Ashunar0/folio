@@ -5,7 +5,24 @@ import { Expense, ExpenseFormInput } from "@/lib/schemas";
 import { assertTeamSelected, canEditExpense } from "@/lib/permissions";
 import { useAuth } from "@/providers/auth-provider";
 
-function mapExpense(row: any): Expense {
+type ExpenseRow = {
+  id: string;
+  date: string;
+  amount: number;
+  type: "expense" | "income";
+  category_id?: string | null;
+  event_id?: string | null;
+  created_by: string;
+  status: "draft" | "submitted" | "approved" | "rejected";
+  memo?: string | null;
+  receipt_url?: string | null;
+  approval_comment?: string | null;
+  categories?: { name?: string | null } | null;
+  events?: { name?: string | null } | null;
+  profiles?: { name?: string | null } | null;
+};
+
+function mapExpense(row: ExpenseRow): Expense {
   return {
     id: row.id,
     date: row.date,

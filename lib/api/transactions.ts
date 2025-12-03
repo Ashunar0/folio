@@ -4,7 +4,22 @@ import { useTeam } from "@/providers/team-provider";
 import { Transaction } from "@/lib/schemas";
 import { assertTeamSelected } from "@/lib/permissions";
 
-function mapTransaction(row: any): Transaction {
+type TransactionRow = {
+  id: string;
+  date: string;
+  amount: number;
+  type: "expense" | "income";
+  category_id?: string | null;
+  event_id?: string | null;
+  created_by: string;
+  memo?: string | null;
+  receipt_url?: string | null;
+  categories?: { name?: string | null } | null;
+  events?: { name?: string | null } | null;
+  profiles?: { name?: string | null } | null;
+};
+
+function mapTransaction(row: TransactionRow): Transaction {
   return {
     id: row.id,
     date: row.date,

@@ -95,7 +95,8 @@ export function TeamProvider({
       if (error) throw error;
       return (data ?? []).map((row) => ({
         id: row.team_id,
-        name: (row as any).teams?.name ?? "",
+        name: (row as { teams?: { name?: string | null } } | null)?.teams
+          ?.name ?? "",
         role: row.role as Team["role"],
       }));
     },
@@ -105,44 +106,54 @@ export function TeamProvider({
     if (authLoading) return;
 
     if (!user?.id) {
-      setTeams([]);
-      setTeamIdState(defaultTeamId);
-      setCurrentTeamRole(null);
-      setPersistedTeamId(null);
-      return;
+      const timeout = window.setTimeout(() => {
+        setTeams([]);
+        setTeamIdState(defaultTeamId);
+        setCurrentTeamRole(null);
+        setPersistedTeamId(null);
+      }, 0);
+      return () => window.clearTimeout(timeout);
     }
 
     if (storageKey && typeof window !== "undefined") {
       const storedTeamId = window.localStorage.getItem(storageKey);
-      setPersistedTeamId(storedTeamId || null);
-      if (storedTeamId) {
-        setTeamIdState(storedTeamId);
-      }
+      const timeout = window.setTimeout(() => {
+        setPersistedTeamId(storedTeamId || null);
+        if (storedTeamId) {
+          setTeamIdState(storedTeamId);
+        }
+      }, 0);
+      return () => window.clearTimeout(timeout);
     }
   }, [authLoading, user?.id, defaultTeamId, storageKey]);
 
   useEffect(() => {
     if (authLoading || !user?.id || !fetchedTeams) return;
 
-    setTeams(fetchedTeams);
+    const timeout = window.setTimeout(() => {
+      setTeams(fetchedTeams);
 
-    const validIds = fetchedTeams.map((t) => t.id);
-    const candidates = [
-      teamId,
-      persistedTeamId,
-      defaultTeamId,
-      fetchedTeams[0]?.id ?? null,
-    ];
-    const nextTeamId =
-      candidates.find((candidate) => candidate && validIds.includes(candidate)) ??
-      null;
+      const validIds = fetchedTeams.map((t) => t.id);
+      const candidates = [
+        teamId,
+        persistedTeamId,
+        defaultTeamId,
+        fetchedTeams[0]?.id ?? null,
+      ];
+      const nextTeamId =
+        candidates.find(
+          (candidate) => candidate && validIds.includes(candidate)
+        ) ?? null;
 
-    if (nextTeamId !== teamId) {
-      setTeamId(nextTeamId);
-    }
+      if (nextTeamId !== teamId) {
+        setTeamId(nextTeamId);
+      }
 
-    const current = fetchedTeams.find((t) => t.id === nextTeamId);
-    setCurrentTeamRole(current ? current.role : null);
+      const current = fetchedTeams.find((t) => t.id === nextTeamId);
+      setCurrentTeamRole(current ? current.role : null);
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
   }, [
     authLoading,
     user?.id,

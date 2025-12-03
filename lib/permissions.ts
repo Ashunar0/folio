@@ -8,7 +8,7 @@ function ensureRole(role: string | null | undefined) {
 }
 
 export function canApprove(role: string | null | undefined) {
-  return APPROVABLE_ROLES.includes((role ?? "") as any);
+  return APPROVABLE_ROLES.includes(role as (typeof APPROVABLE_ROLES)[number]);
 }
 
 export function assertCanApprove(role: string | null | undefined) {
@@ -54,7 +54,10 @@ export function canDeleteTransaction(params: {
 }) {
   const { transaction, role } = params;
   if (!role) return false;
-  return MANAGE_ROLES.includes(role as any) && !!transaction.createdById;
+  return (
+    MANAGE_ROLES.includes(role as (typeof MANAGE_ROLES)[number]) &&
+    !!transaction.createdById
+  );
 }
 
 export function assertTeamSelected(teamId: string | null | undefined) {
@@ -65,7 +68,7 @@ export function assertTeamSelected(teamId: string | null | undefined) {
 
 export function assertCanManageTeamUser(role: string | null | undefined) {
   ensureRole(role);
-  if (!MANAGE_ROLES.includes((role ?? "") as any)) {
+  if (!MANAGE_ROLES.includes(role as (typeof MANAGE_ROLES)[number])) {
     throw new Error("ロール変更は admin / manager のみ実行できます");
   }
 }

@@ -22,7 +22,15 @@ type DeleteEventInput = {
   teamId: string;
 };
 
-function mapEvent(row: any): EventItem {
+type EventRow = {
+  id: string;
+  name: string;
+  date?: string | null;
+  team_id: string;
+  created_at?: string;
+};
+
+function mapEvent(row: EventRow): EventItem {
   return {
     id: row.id,
     name: row.name,
