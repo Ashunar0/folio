@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, JapaneseYen, SendIcon, UploadCloud } from "lucide-react";
@@ -36,15 +36,20 @@ import { uploadReceipt } from "@/lib/storage";
 import { useSupabase } from "@/providers/supabase-provider";
 import { useTeam } from "@/providers/team-provider";
 import { useCreateExpense } from "@/lib/api/expenses";
+import { useCategories } from "@/lib/api/categories";
 
 export default function ExpenseFormClient() {
   const supabase = useSupabase();
   const { teamId } = useTeam();
   const createExpense = useCreateExpense();
+  const categoriesQuery = useCategories();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [categoryOptions, setCategoryOptions] = useState<
+    { id: string; name: string; type: "expense" | "income" }[]
+  >([]);
 
   const form = useForm<ExpenseFormInput>({
     resolver: zodResolver(expenseFormSchema) as any,
@@ -58,6 +63,36 @@ export default function ExpenseFormClient() {
       receiptUrl: null,
     },
   });
+
+  const watchType = form.watch("type");
+
+  useEffect(() => {
+    if (categoriesQuery.data) {
+      const mapped = categoriesQuery.data.map((c) => ({
+        id: c.id,
+        name: c.name,
+        type: (c.type as "expense" | "income" | undefined) ?? "expense",
+      }));
+      setCategoryOptions(mapped);
+    }
+  }, [categoriesQuery.data]);
+
+  const filteredCategories = useMemo(() => {
+    if (!categoryOptions.length) return [];
+    if (watchType === "income") {
+      return categoryOptions.filter((c) => c.type === "income");
+    }
+    return categoryOptions.filter((c) => c.type !== "income");
+  }, [categoryOptions, watchType]);
+
+  useEffect(() => {
+    const current = form.getValues("category");
+    if (!current) return;
+    const exists = filteredCategories.some((c) => c.name === current);
+    if (!exists) {
+      form.setValue("category", "");
+    }
+  }, [filteredCategories, form]);
 
   const onSubmit = async (data: ExpenseFormInput) => {
     setSubmitError(null);
@@ -196,21 +231,32 @@ export default function ExpenseFormClient() {
                   <FormLabel>Category</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
+                    disabled={categoriesQuery.isLoading}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="選択してください" />
+                        <SelectValue
+                          placeholder={
+                            categoriesQuery.isLoading
+                              ? "Loading..."
+                              : "選択してください"
+                          }
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="交通費">交通費</SelectItem>
-                      <SelectItem value="宿泊費">宿泊費</SelectItem>
-                      <SelectItem value="接待交際費">接待交際費</SelectItem>
-                      <SelectItem value="消耗品費">消耗品費</SelectItem>
-                      <SelectItem value="備品費">備品費</SelectItem>
-                      <SelectItem value="飲食費">飲食費</SelectItem>
-                      <SelectItem value="雑費">雑費</SelectItem>
+                      {filteredCategories.length === 0 ? (
+                        <SelectItem value="no-categories" disabled>
+                          該当するカテゴリがありません
+                        </SelectItem>
+                      ) : (
+                        filteredCategories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.name}>
+                            {cat.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

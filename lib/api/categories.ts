@@ -26,6 +26,7 @@ function mapCategory(row: any): Category {
     name: row.name,
     teamId: row.team_id,
     createdAt: row.created_at,
+    type: row.type ?? "expense",
   };
 }
 
