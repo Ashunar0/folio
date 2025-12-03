@@ -41,7 +41,8 @@ export default function CategoriesClient() {
   );
 
   useEffect(() => {
-    if (categoriesQuery.data) {
+    if (!categoriesQuery.data) return;
+    const timeout = window.setTimeout(() => {
       setExpenseCategories(
         categoriesQuery.data.filter((c) => c.type !== "income")
       );
@@ -52,7 +53,10 @@ export default function CategoriesClient() {
         const target = categoriesQuery.data.find((c) => c.id === editingId);
         if (target) setEditingName(target.name);
       }
-    }
+    }, 0);
+    return () => {
+      window.clearTimeout(timeout);
+    };
   }, [categoriesQuery.data, editingId]);
 
   const {
@@ -76,7 +80,7 @@ export default function CategoriesClient() {
             id: cat.id,
             team_id: cat.teamId!,
             sort_order: order,
-            type: (cat.type as any) ?? "expense",
+            type: cat.type === "income" ? "income" : "expense",
             name: cat.name,
           });
           order += 1;
@@ -114,7 +118,7 @@ export default function CategoriesClient() {
             id: cat.id,
             team_id: cat.teamId!,
             sort_order: order,
-            type: (cat.type as any) ?? "income",
+            type: cat.type === "income" ? "income" : "expense",
             name: cat.name,
           });
           order += 1;
@@ -174,7 +178,7 @@ export default function CategoriesClient() {
         id: target.id,
         name,
         teamId: target.teamId,
-        type: target.type as any,
+        type: target.type === "income" ? "income" : "expense",
       });
       setEditingId(null);
       setEditingName("");

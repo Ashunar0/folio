@@ -28,7 +28,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useApproveExpense, useRejectExpense } from "@/lib/api/approvals";
 import { useState } from "react";
-import { toast } from "sonner";
 
 const statusMap: Record<string, string> = {
   draft: "下書き",
@@ -93,7 +92,7 @@ export function ApprovalSheet({
         if (!isNaN(dateObj.getTime())) {
           formattedDate = dateObj.toISOString().split("T")[0];
         }
-      } catch (e) {
+      } catch {
         console.error("Invalid date format:", expense.date);
       }
 
@@ -110,7 +109,7 @@ export function ApprovalSheet({
 
   if (!expense) return null;
 
-  const onApprove = async (data: ApprovalFormValues) => {
+  const onApprove = async () => {
     if (!expense) return;
     if (!canApprove) {
       setActionError("承認権限がありません");
@@ -144,7 +143,7 @@ export function ApprovalSheet({
   };
 
   const handleApprove = async () => {
-    await onApprove(form.getValues());
+    await onApprove();
   };
   const handleReject = async () => {
     await onReject(form.getValues());

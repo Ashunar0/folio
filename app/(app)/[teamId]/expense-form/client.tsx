@@ -52,7 +52,7 @@ export default function ExpenseFormClient() {
   >([]);
 
   const form = useForm<ExpenseFormInput>({
-    resolver: zodResolver(expenseFormSchema) as any,
+    resolver: zodResolver(expenseFormSchema),
     defaultValues: {
       date: format(new Date(), "yyyy-MM-dd"),
       amount: 0,
@@ -110,9 +110,15 @@ export default function ExpenseFormClient() {
         memo: "",
         receiptUrl: null,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setSubmitError(err.message ?? "申請に失敗しました");
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "申請に失敗しました";
+      setSubmitError(message);
     }
   };
 
@@ -351,9 +357,15 @@ export default function ExpenseFormClient() {
                             userId: user.id,
                           });
                           field.onChange(path);
-                        } catch (err: any) {
+                        } catch (err: unknown) {
                           console.error(err);
-                          setUploadError(err.message ?? "アップロードに失敗しました");
+                          const message =
+                            err instanceof Error
+                              ? err.message
+                              : typeof err === "string"
+                                ? err
+                                : "アップロードに失敗しました";
+                          setUploadError(message);
                         } finally {
                           setIsUploading(false);
                           e.target.value = ""; // allow re-upload same file

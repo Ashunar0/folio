@@ -39,7 +39,8 @@ export default function EventsClient() {
   );
 
   useEffect(() => {
-    if (eventsQuery.data) {
+    if (!eventsQuery.data) return;
+    const timeout = window.setTimeout(() => {
       setEvents(eventsQuery.data);
       if (editingId) {
         const target = eventsQuery.data.find((e) => e.id === editingId);
@@ -48,7 +49,8 @@ export default function EventsClient() {
           setEditingDate(target.date ?? "");
         }
       }
-    }
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [eventsQuery.data, editingId]);
 
   const {

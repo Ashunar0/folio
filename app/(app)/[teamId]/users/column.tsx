@@ -24,6 +24,13 @@ import {
 import { User } from "@/lib/schemas";
 import { RoleBadge } from "@/components/role-badge";
 
+type UsersTableMeta = {
+  canManage?: boolean;
+  onView?: (user: User) => void;
+  onEdit?: (user: User) => void;
+  onDelete?: (user: User) => void;
+};
+
 // --- Status Badge ---
 const statusBadge = {
   active: (
@@ -48,7 +55,7 @@ export const userColumns: ColumnDef<User>[] = [
   {
     id: "actions",
     cell: ({ table, row }) => {
-      const meta = table.options.meta as any;
+      const meta = table.options.meta as UsersTableMeta | undefined;
       const canManage = Boolean(meta?.canManage);
 
       return (

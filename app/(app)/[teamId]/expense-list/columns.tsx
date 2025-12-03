@@ -20,6 +20,15 @@ import {
 import { Link2 } from "lucide-react";
 import { Expense } from "@/lib/schemas";
 
+type ExpenseTableMeta = {
+  canManageAll?: boolean;
+  currentUserId?: string;
+  onView?: (expense: Expense) => void;
+  onEdit?: (expense: Expense) => void;
+  onDelete?: (expense: Expense) => void;
+  onReceiptPreview?: (url: string) => void;
+};
+
 // ステータス用バッジ
 const statusLabel = {
   draft: (
@@ -48,9 +57,9 @@ export const columns: ColumnDef<Expense>[] = [
   {
     id: "actions",
     cell: ({ table, row }) => {
-      const meta = table.options.meta as any;
+      const meta = table.options.meta as ExpenseTableMeta | undefined;
       const canManageAll = Boolean(meta?.canManageAll);
-      const currentUserId = meta?.currentUserId as string | undefined;
+      const currentUserId = meta?.currentUserId;
       const isOwner = row.original.createdBy === currentUserId;
       const canEditThis =
         (canManageAll || isOwner) &&
@@ -163,7 +172,7 @@ export const columns: ColumnDef<Expense>[] = [
     header: "Receipt",
     cell: ({ row, table }) => {
       const url = row.original.receiptUrl;
-      const meta = table.options.meta as any;
+      const meta = table.options.meta as ExpenseTableMeta | undefined;
       return url ? (
         <Button
           variant="ghost"

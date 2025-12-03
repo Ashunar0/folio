@@ -17,7 +17,6 @@ import {
   AlertTriangle,
   Database,
   Download,
-  ExternalLink,
   Link as LinkIcon,
   Settings,
   Shield,
@@ -25,6 +24,7 @@ import {
   Upload,
   Users,
   UserPlus,
+  Copy,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -40,21 +40,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+// } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { RoleBadge } from "@/components/role-badge";
 import { User } from "@/lib/schemas";
-import { useDragReorder } from "@/hooks/use-drag-reorder";
 import { Switch } from "@/components/ui/switch";
 
 export default function TeamSettingsClient() {
@@ -66,20 +65,7 @@ export default function TeamSettingsClient() {
     description: "Main workspace for Acme Corporation financial management.",
   };
 
-  const [expenseCategories, setExpenseCategories] = useState([
-    { id: 1, name: "Travel" },
-    { id: 2, name: "Meals" },
-    { id: 3, name: "Software" },
-    { id: 4, name: "Office Supplies" },
-  ]);
-
-  const [events, setEvents] = useState([
-    { id: 1, name: "Q1 Planning" },
-    { id: 2, name: "Team Building" },
-    { id: 3, name: "Annual Conference" },
-  ]);
-
-  const [invitations, setInvitations] = useState([
+  const invitations = [
     {
       id: 1,
       token: "inv_abc123xyz",
@@ -102,7 +88,7 @@ export default function TeamSettingsClient() {
       maxUses: 5,
       usedCount: 0,
     },
-  ]);
+  ];
 
   // Mock: 実際にはログインユーザーの権限を取得
   const userRole = "admin"; // or "manager", "member", "viewer"
@@ -112,8 +98,6 @@ export default function TeamSettingsClient() {
   // Dialog states
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [isRoleChangeDialogOpen, setIsRoleChangeDialogOpen] = useState(false);
-  const [isRemoveMemberDialogOpen, setIsRemoveMemberDialogOpen] =
-    useState(false);
   const [selectedMember, setSelectedMember] = useState<User | null>(null);
 
   // Form states for invite dialog
@@ -153,11 +137,11 @@ export default function TeamSettingsClient() {
     });
   };
 
-  const handleOpenRoleChange = (member: User) => {
-    setSelectedMember(member);
-    setNewRole(member.role);
-    setIsRoleChangeDialogOpen(true);
-  };
+  // const handleOpenRoleChange = (member: User) => {
+  //   setSelectedMember(member);
+  //   setNewRole(member.role);
+  //   setIsRoleChangeDialogOpen(true);
+  // };
 
   const handleChangeRole = () => {
     if (!selectedMember) return;
@@ -173,35 +157,18 @@ export default function TeamSettingsClient() {
     setSelectedMember(null);
   };
 
-  const handleOpenRemoveMember = (member: User) => {
-    setSelectedMember(member);
-    setIsRemoveMemberDialogOpen(true);
-  };
-
-  const handleRemoveMember = () => {
-    if (!selectedMember) return;
-    console.log("❌ Removing member from team:", {
-      userId: selectedMember.id,
-      userName: selectedMember.name,
-      userEmail: selectedMember.email,
-      removedBy: userRole,
-      timestamp: new Date().toISOString(),
-    });
-    setIsRemoveMemberDialogOpen(false);
-    setSelectedMember(null);
-  };
-
-  const {
-    handleDragStart: handleCategoryDragStart,
-    handleDragEnter: handleCategoryDragEnter,
-    handleDragEnd: handleCategoryDragEnd,
-  } = useDragReorder(expenseCategories, setExpenseCategories);
-
-  const {
-    handleDragStart: handleEventDragStart,
-    handleDragEnter: handleEventDragEnter,
-    handleDragEnd: handleEventDragEnd,
-  } = useDragReorder(events, setEvents);
+  // const handleRemoveMember = () => {
+  //   if (!selectedMember) return;
+  //   console.log("❌ Removing member from team:", {
+  //     userId: selectedMember.id,
+  //     userName: selectedMember.name,
+  //     userEmail: selectedMember.email,
+  //     removedBy: userRole,
+  //     timestamp: new Date().toISOString(),
+  //   });
+  //   setIsRemoveMemberDialogOpen(false);
+  //   setSelectedMember(null);
+  // };
 
   return (
     <div className="w-full max-w-3xl space-y-10 py-8 mx-auto">
@@ -825,7 +792,7 @@ export default function TeamSettingsClient() {
       </Dialog>
 
       {/* Remove Member Alert Dialog */}
-      <AlertDialog
+      {/* <AlertDialog
         open={isRemoveMemberDialogOpen}
         onOpenChange={setIsRemoveMemberDialogOpen}
       >
@@ -864,7 +831,7 @@ export default function TeamSettingsClient() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </div>
   );
 }

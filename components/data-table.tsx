@@ -31,10 +31,8 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -53,7 +51,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SearchForm } from "./search-form";
-import { EmptyState } from "./ui/empty-state";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Inbox } from "lucide-react";
 
 export const schema = z.object({

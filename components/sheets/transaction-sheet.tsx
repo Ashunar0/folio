@@ -95,7 +95,7 @@ export function TransactionSheet({
         if (!isNaN(dateObj.getTime())) {
           formattedDate = dateObj.toISOString().split("T")[0];
         }
-      } catch (err) {
+      } catch {
         console.error("Invalid date format:", transaction.date);
       }
 
@@ -111,8 +111,8 @@ export function TransactionSheet({
 
   if (!transaction) return null;
 
-  const onSubmit = (data: TransactionFormValues) => {
-    console.log("Saving data:", data);
+  const onSubmit = () => {
+    console.log("Saving data:", form.getValues());
     setIsEditMode(false);
   };
 
@@ -150,7 +150,7 @@ export function TransactionSheet({
           <Form {...form}>
             <form
               id="transaction-form"
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={() => onSubmit()}
               className="grid gap-4"
             >
               <FormField

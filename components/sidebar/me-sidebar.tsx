@@ -10,7 +10,6 @@ import {
   SidebarContent,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/providers/auth-provider";
 import { useTeam } from "@/providers/team-provider";
 import Link from "next/link";
 

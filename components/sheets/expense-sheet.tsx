@@ -104,7 +104,7 @@ export function ExpenseSheet({
         if (!isNaN(dateObj.getTime())) {
           formattedDate = dateObj.toISOString().split("T")[0];
         }
-      } catch (e) {
+      } catch {
         console.error("Invalid date format:", expense.date);
       }
 

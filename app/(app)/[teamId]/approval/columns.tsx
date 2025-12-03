@@ -2,23 +2,21 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  IconCheck,
-  IconX,
-  IconDotsVertical,
-  IconEye,
-} from "@tabler/icons-react";
+import { IconDotsVertical, IconEye } from "@tabler/icons-react";
 import { Link2 } from "lucide-react";
 import { Expense } from "@/lib/schemas";
+
+type ApprovalTableMeta = {
+  onEdit?: (expense: Expense) => void;
+  onReceiptPreview?: (url: string) => void;
+};
 
 export const approvalColumns: ColumnDef<Expense>[] = [
   // === Actions（承認/却下）===========================================
@@ -26,7 +24,7 @@ export const approvalColumns: ColumnDef<Expense>[] = [
     id: "actions",
     cell: ({ table, row }) => {
       const expense = row.original;
-      const meta = table.options.meta as any;
+      const meta = table.options.meta as ApprovalTableMeta | undefined;
 
       return (
         <DropdownMenu>
@@ -114,7 +112,7 @@ export const approvalColumns: ColumnDef<Expense>[] = [
     header: "Receipt",
     cell: ({ row, table }) => {
       const url = row.original.receiptUrl;
-      const meta = table.options.meta as any;
+      const meta = table.options.meta as ApprovalTableMeta | undefined;
       return url ? (
         <Button
           variant="ghost"

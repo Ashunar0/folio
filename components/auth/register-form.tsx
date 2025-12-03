@@ -37,7 +37,7 @@ export function RegisterForm({
   const {
     register,
     handleSubmit,
-    watch,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     defaultValues: {
@@ -69,10 +69,14 @@ export function RegisterForm({
         password: values.password,
         name,
       });
-      setSuccess("Account created. Check your email to confirm and then sign in.");
+      setSuccess(
+        "Account created. Check your email to confirm and then sign in."
+      );
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to create account. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Failed to create account. Please try again.";
       setError(message);
     }
   };
@@ -171,7 +175,8 @@ export function RegisterForm({
                     {...register("confirmPassword", {
                       required: "Please confirm your password",
                       validate: (value) =>
-                        value === watch("password") || "Passwords do not match",
+                        value === getValues("password") ||
+                        "Passwords do not match",
                     })}
                     required
                   />
