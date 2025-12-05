@@ -34,7 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           warning:
             "!bg-amber-50 dark:!bg-amber-950 !text-amber-600 dark:!text-amber-400 !border-amber-500/50 dark:!border-amber-600/50",
           info: "!bg-blue-50 dark:!bg-blue-950 !text-blue-600 dark:!text-blue-400 !border-blue-500/50 dark:!border-blue-600/50",
-          description: "!text-inherit/80",
+          description: "!text-inherit",
         },
       }}
       style={

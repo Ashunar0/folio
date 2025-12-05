@@ -13,18 +13,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { createInvite, revokeInvite } from "@/lib/actions/invites";
+import { toast } from "sonner";
 import {
   AlertTriangle,
+  Copy,
   Database,
   Download,
+  ExternalLink,
   Link as LinkIcon,
+  Pen,
   Settings,
   Shield,
   Trash,
   Upload,
   Users,
   UserPlus,
-  Copy,
+  Check,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,7 +61,15 @@ import { RoleBadge } from "@/components/role-badge";
 import { User } from "@/lib/schemas";
 import { Switch } from "@/components/ui/switch";
 
-export default function TeamSettingsClient() {
+interface SettingsClientProps {
+  teamId: string;
+  initialInvitations: any[];
+}
+
+export default function TeamSettingsClient({
+  teamId,
+  initialInvitations = [],
+}: SettingsClientProps) {
   // Mock Data
   const team = {
     name: "Acme Corp",
@@ -64,31 +77,7 @@ export default function TeamSettingsClient() {
     icon: "https://avatar.vercel.sh/acme",
     description: "Main workspace for Acme Corporation financial management.",
   };
-
-  const invitations = [
-    {
-      id: 1,
-      token: "inv_abc123xyz",
-      link: "https://app.example.com/invite/inv_abc123xyz",
-      defaultRole: "member",
-      expiresAt: "2025-12-31",
-      createdBy: "Admin User",
-      createdAt: "2025-11-20",
-      maxUses: 10,
-      usedCount: 3,
-    },
-    {
-      id: 2,
-      token: "inv_def456uvw",
-      link: "https://app.example.com/invite/inv_def456uvw",
-      defaultRole: "viewer",
-      expiresAt: "2025-12-15",
-      createdBy: "Manager User",
-      createdAt: "2025-11-25",
-      maxUses: 5,
-      usedCount: 0,
-    },
-  ];
+  const [invitations, setInvitations] = useState(initialInvitations);
 
   // Mock: 実際にはログインユーザーの権限を取得
   const userRole = "admin"; // or "manager", "member", "viewer"
@@ -108,33 +97,60 @@ export default function TeamSettingsClient() {
   // Form state for role change
   const [newRole, setNewRole] = useState<User["role"]>("member");
 
+  // Copy state
+  const [copiedInviteId, setCopiedInviteId] = useState<string | null>(null);
+
   // Handlers
-  const handleGenerateInvite = () => {
-    console.log("🔗 Generating invitation link:", {
-      defaultRole: inviteRole,
-      expiresInDays: inviteExpiry,
-      maxUses: inviteMaxUses,
-      createdBy: userRole,
-      timestamp: new Date().toISOString(),
-    });
+  const handleGenerateInvite = async () => {
     setIsInviteDialogOpen(false);
-    // Reset form
-    setInviteRole("member");
-    setInviteExpiry("7");
-    setInviteMaxUses("10");
+    
+    const expiresInDays = inviteExpiry === "never" ? null : parseInt(inviteExpiry);
+    
+    const result = await createInvite(teamId, inviteRole, expiresInDays);
+    
+    if (result.success && result.invite) {
+      const newInvite = {
+        id: result.invite.token,
+        token: result.invite.token,
+        link: `${window.location.origin}/invite/${result.invite.token}`,
+        defaultRole: result.invite.role,
+        expiresAt: result.invite.expires_at ? new Date(result.invite.expires_at).toLocaleDateString() : "Never",
+        maxUses: 9999, // Unlimited
+        usedCount: 0,
+        createdBy: "You", // Ideally fetch user name or handle in UI
+        createdAt: new Date().toISOString().split('T')[0],
+      };
+      
+      setInvitations([newInvite, ...invitations]);
+      toast.success("Invitation link generated", {
+        description: "The link has been copied to your clipboard.",
+      });
+      navigator.clipboard.writeText(newInvite.link);
+    } else {
+      toast.error("Failed to generate invite", {
+        description: result.error,
+      });
+    }
   };
 
-  const handleCopyInvite = (link: string) => {
-    console.log("📋 Copying invitation link:", link);
-    // 実際の実装: navigator.clipboard.writeText(link)
+  const handleCopyInvite = (link: string, id: string) => {
+    navigator.clipboard.writeText(link);
+    setCopiedInviteId(id);
+    toast.success("Copied to clipboard");
+    setTimeout(() => setCopiedInviteId(null), 2000);
   };
 
-  const handleRevokeInvite = (inviteId: number) => {
-    console.log("🗑️ Revoking invitation:", {
-      inviteId,
-      revokedBy: userRole,
-      timestamp: new Date().toISOString(),
-    });
+  const handleRevokeInvite = async (id: string) => {
+    const result = await revokeInvite(teamId, id);
+    
+    if (result.success) {
+      setInvitations(invitations.filter((i) => i.id !== id));
+      toast.success("Invitation revoked");
+    } else {
+      toast.error("Failed to revoke invite", {
+        description: result.error,
+      });
+    }
   };
 
   // const handleOpenRoleChange = (member: User) => {
@@ -417,9 +433,13 @@ export default function TeamSettingsClient() {
                             size="icon"
                             className="h-7 w-7"
                             title="Copy link"
-                            onClick={() => handleCopyInvite(invite.link)}
+                            onClick={() => handleCopyInvite(invite.link, invite.id)}
                           >
-                            <Copy className="h-3 w-3" />
+                            {copiedInviteId === invite.id ? (
+                              <Check className="h-3 w-3 text-green-600" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
                           </Button>
                           {canRevokeInvite && (
                             <Button
