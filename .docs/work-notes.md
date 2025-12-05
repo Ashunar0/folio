@@ -114,3 +114,53 @@
 - **User Sheet Fix**
   - Member/viewer roles: Edit button is now hidden instead of disabled
   - Modified conditional rendering in `components/sheets/user-sheet.tsx`
+
+## Toast Notifications & UX Improvements (2025-12-05)
+
+### Toast Notifications
+
+- **Toaster Setup** (`app/layout.tsx`)
+  - Added global `Toaster` component with `position="top-right"`
+  - Configured to use `sonner` library
+
+- **Toast Styling** (`components/ui/sonner.tsx`)
+  - Styled to match `AlertSuccess` color scheme from `alert-toast.tsx`
+  - Custom icons using lucide-react (`CircleCheckBigIcon`, `OctagonAlertIcon`, etc.)
+  - Opaque backgrounds for all toast types (success: emerald-50, error: red-50, warning: amber-50, info: blue-50)
+  - Dark mode support
+
+- **Expense Submission Toasts**
+  - `components/sheets/expense-sheet.tsx`: Added success/error toasts for expense submission and draft save
+  - `app/(app)/[teamId]/expense-form/client.tsx`: Added toast notifications, removed redundant success message display
+
+- **Auth Toasts**
+  - `components/auth/login-form.tsx`: Added success/error toasts for login
+  - `components/auth/register-form.tsx`: Added success/error toasts for registration
+
+### DataTable Search & Filter
+
+- **DataTable Enhancement** (`components/data-table.tsx`)
+  - Added `searchColumn` prop for text search
+  - Added `filters` prop for dropdown filters with `FilterConfig` type
+  - Added "Clear" button to reset all filters
+  - Removed unused Tabs UI for cleaner interface
+
+- **Page-specific Configurations**
+  - `expense-list`: Search by category, filter by status (下書き/申請中/承認済/差戻し) and type (支出/収入)
+  - `transactions`: Search by category, filter by type
+  - `approval`: Search by category only
+  - `users`: Search by name, filter by role (Admin/Manager/Member/Viewer) and status (Active/Invited/Suspended)
+
+### Team Creation Flow
+
+- **Default Categories** (`supabase/migrations/0012_default_categories.sql`)
+  - Updated `create_team` RPC to auto-create default categories
+  - Expense categories: 交通費, 備品・消耗品, 会場・設備利用費, 飲食・打ち上げ費, 合宿・イベント費, 接待交際費, 広報・印刷費, 雑費, その他
+  - Income categories: 部費・会費, イベント収益, 補助金・助成金, スポンサー・協賛, その他
+
+- **Team Creation Redirect** (`components/auth/create-team-form.tsx`)
+  - Fixed redirect to go to new team's dashboard instead of home
+  - Used `create_team` RPC return value (new team ID) for redirect
+  - Added `queryClient.invalidateQueries` to refresh team list in team-switcher
+  - Added `setTeamId` to switch active team to newly created one
+
