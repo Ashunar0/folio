@@ -9,12 +9,6 @@ import {
   parseISO,
 } from "date-fns";
 
-type TransactionRow = {
-  date: string;
-  amount: number;
-  type: "expense" | "income";
-  categories?: { name?: string | null } | null;
-};
 
 export type MonthlySummary = {
   totalExpense: number;

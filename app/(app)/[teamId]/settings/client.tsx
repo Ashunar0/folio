@@ -20,9 +20,7 @@ import {
   Copy,
   Database,
   Download,
-  ExternalLink,
   Link as LinkIcon,
-  Pen,
   Settings,
   Shield,
   Trash,
@@ -61,9 +59,21 @@ import { RoleBadge } from "@/components/role-badge";
 import { User } from "@/lib/schemas";
 import { Switch } from "@/components/ui/switch";
 
+type InviteRow = {
+  id: string;
+  token: string;
+  link: string;
+  defaultRole: string;
+  expiresAt: string;
+  maxUses: number;
+  usedCount: number;
+  createdBy: string;
+  createdAt: string;
+};
+
 interface SettingsClientProps {
   teamId: string;
-  initialInvitations: any[];
+  initialInvitations: InviteRow[];
 }
 
 export default function TeamSettingsClient({

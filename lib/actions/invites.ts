@@ -3,10 +3,18 @@
 import { createClient } from "@/supabase/server";
 import { revalidatePath } from "next/cache";
 
+type Invite = {
+  token: string;
+  team_id: string;
+  role: string;
+  expires_at: string | null;
+  created_by: string;
+};
+
 export type CreateInviteResult = {
   success: boolean;
   error?: string;
-  invite?: any;
+  invite?: Invite;
 };
 
 export async function createInvite(

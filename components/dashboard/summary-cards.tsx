@@ -20,26 +20,7 @@ function formatCurrency(value: number) {
   return `¥${Math.abs(value).toLocaleString()}`;
 }
 
-function ChangeIndicator({
-  current,
-  previous,
-}: {
-  current: number;
-  previous: number;
-}) {
-  if (previous === 0) return null;
-  const change = ((current - previous) / previous) * 100;
-  const isPositive = change > 0;
 
-  return (
-    <span
-      className={`text-xs ${isPositive ? "text-red-500" : "text-emerald-500"}`}
-    >
-      {isPositive ? "+" : ""}
-      {change.toFixed(0)}% vs 先月
-    </span>
-  );
-}
 
 function SummaryCardSkeleton() {
   return (
@@ -100,7 +81,7 @@ export function SummaryCards() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            This Month's Expense
+            This Month&apos;s Expense
           </CardTitle>
           <IconArrowDownRight className="h-4 w-4 text-red-500" />
         </CardHeader>
@@ -115,7 +96,7 @@ export function SummaryCards() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            This Month's Income
+            This Month&apos;s Income
           </CardTitle>
           <IconArrowUpRight className="h-4 w-4 text-emerald-500" />
         </CardHeader>

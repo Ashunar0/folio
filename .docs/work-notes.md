@@ -164,3 +164,49 @@
   - Added `queryClient.invalidateQueries` to refresh team list in team-switcher
   - Added `setTeamId` to switch active team to newly created one
 
+## Invite Link Generation & Management (2025-12-05)
+
+### Server Actions (`lib/actions/invites.ts`)
+- **`createInvite`**: Creates invite with role, expiration, generates token
+- **`revokeInvite`**: Deletes invite by token
+
+### Settings Page Invite Management
+- **Generate Link Dialog** (`app/(app)/[teamId]/settings/client.tsx`)
+  - Role selection (member/viewer)
+  - Expiration period (1d/7d/30d/90d/never)
+  - Auto-copy to clipboard on generation
+  - Copy button with checkmark feedback (2 seconds)
+- **Invite List**: Shows active invitations with role, expiry, usage count
+- **Revoke**: Admin can delete invites
+
+### Login/Register Redirect Flow
+- **Middleware**: Sets `?redirect=` param when redirecting unauthenticated users
+- **LoginForm/RegisterForm**: 
+  - Reads `redirect` search param
+  - Preserves redirect when switching between login/register
+  - Redirects to original destination after auth
+
+### Team Join Flow Fixes
+- **localStorage Update**: `JoinTeamForm` now updates `folio:last-team:<userId>` before redirect
+- **Middleware Bypass**: Added `?joined=true` param to skip membership check for fresh joins
+- **TeamProvider**: Correctly uses new team after join
+
+### Invite Link Input UX
+- **OnboardingForm**: Changed from token input to link input
+  - Accepts full link or raw token
+  - Extracts token from link format `/invite/[token]`
+- **Team Switcher**: 
+  - Added "Join Team" button with UserPlus icon
+  - Opens dialog for invite link input
+  - Same link/token extraction logic
+
+### Files Changed
+- `lib/actions/invites.ts` (new)
+- `app/(app)/[teamId]/settings/client.tsx`
+- `app/(app)/[teamId]/settings/page.tsx`
+- `components/auth/login-form.tsx`
+- `components/auth/register-form.tsx`
+- `components/auth/join-team-form.tsx`
+- `components/auth/onboarding-form.tsx`
+- `components/sidebar/team-switcher.tsx`
+- `middleware.ts`
