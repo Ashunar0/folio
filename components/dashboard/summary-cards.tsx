@@ -108,10 +108,6 @@ export function SummaryCards() {
           <div className="text-2xl font-bold text-red-600">
             {formatCurrency(s?.totalExpense ?? 0)}
           </div>
-          <ChangeIndicator
-            current={s?.totalExpense ?? 0}
-            previous={s?.prevMonthExpense ?? 0}
-          />
         </CardContent>
       </Card>
 
@@ -127,10 +123,6 @@ export function SummaryCards() {
           <div className="text-2xl font-bold text-emerald-600">
             {formatCurrency(s?.totalIncome ?? 0)}
           </div>
-          <ChangeIndicator
-            current={s?.totalIncome ?? 0}
-            previous={s?.prevMonthIncome ?? 0}
-          />
         </CardContent>
       </Card>
 

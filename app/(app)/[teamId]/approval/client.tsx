@@ -89,6 +89,8 @@ export default function ApprovalClient() {
         data={data ?? []}
         columns={approvalColumns}
         onRowClick={handleRowClick}
+        searchColumn="category"
+        searchPlaceholder="Search by category..."
         meta={{
           onEdit: handleReview,
           onReceiptPreview: handleReceiptPreview,

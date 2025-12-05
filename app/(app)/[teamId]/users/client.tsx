@@ -72,6 +72,29 @@ export default function UsersClient() {
         data={data ?? []}
         columns={userColumns}
         onRowClick={handleRowClick}
+        searchColumn="name"
+        searchPlaceholder="Search by name..."
+        filters={[
+          {
+            column: "role",
+            label: "Role",
+            options: [
+              { value: "admin", label: "Admin" },
+              { value: "manager", label: "Manager" },
+              { value: "member", label: "Member" },
+              { value: "viewer", label: "Viewer" },
+            ],
+          },
+          {
+            column: "status",
+            label: "Status",
+            options: [
+              { value: "active", label: "Active" },
+              { value: "invited", label: "Invited" },
+              { value: "suspended", label: "Suspended" },
+            ],
+          },
+        ]}
         meta={{
           onView: handleView,
           onEdit: handleEdit,

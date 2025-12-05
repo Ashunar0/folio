@@ -70,6 +70,18 @@ export default function TransactionsClient() {
         data={data ?? []}
         columns={columns}
         onRowClick={handleRowClick}
+        searchColumn="category"
+        searchPlaceholder="Search by category..."
+        filters={[
+          {
+            column: "type",
+            label: "Type",
+            options: [
+              { value: "expense", label: "支出" },
+              { value: "income", label: "収入" },
+            ],
+          },
+        ]}
         meta={{
           onView: handleView,
           onEdit: handleEdit,

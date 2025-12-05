@@ -106,6 +106,28 @@ export default function ExpenseListClient() {
         data={data ?? []}
         columns={columns}
         onRowClick={handleRowClick}
+        searchColumn="category"
+        searchPlaceholder="Search by category..."
+        filters={[
+          {
+            column: "status",
+            label: "Status",
+            options: [
+              { value: "draft", label: "下書き" },
+              { value: "submitted", label: "申請中" },
+              { value: "approved", label: "承認済" },
+              { value: "rejected", label: "差戻し" },
+            ],
+          },
+          {
+            column: "type",
+            label: "Type",
+            options: [
+              { value: "expense", label: "支出" },
+              { value: "income", label: "収入" },
+            ],
+          },
+        ]}
         meta={{
           onView: handleView,
           onEdit: handleEdit,
