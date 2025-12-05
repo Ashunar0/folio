@@ -59,7 +59,7 @@ export function LoginForm({
     const password = values.password;
     try {
       await signIn({ email, password });
-      
+
       // Check for redirect URL from query params
       if (redirectUrl) {
         router.push(redirectUrl);
@@ -75,7 +75,9 @@ export function LoginForm({
       }
 
       // Fetch user's teams to determine redirect
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         const { data: teams } = await supabase
           .from("team_users")
@@ -96,7 +98,9 @@ export function LoginForm({
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to sign in. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Failed to sign in. Please try again.";
       setError(message);
       toast.error("ログインに失敗しました", { description: message });
     }
@@ -107,7 +111,9 @@ export function LoginForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Sign in with your email and password</CardDescription>
+          <CardDescription>
+            Sign in with your email and password
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -178,15 +184,21 @@ export function LoginForm({
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
               </FieldSeparator>
-              <Field>
+              {/* <Field>
                 <Button variant="outline" type="button">
                   <GoogleLogo />
                   Continue with Google
                 </Button>
-              </Field>
+              </Field> */}
               <FieldDescription className="text-center">
                 Don&apos;t have an account?{" "}
-                <Link href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : "/register"}>
+                <Link
+                  href={
+                    redirectUrl
+                      ? `/register?redirect=${encodeURIComponent(redirectUrl)}`
+                      : "/register"
+                  }
+                >
                   Sign up
                 </Link>
               </FieldDescription>

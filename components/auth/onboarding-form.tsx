@@ -14,16 +14,21 @@ export function OnboardingForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
-  const [inviteToken, setInviteToken] = useState("");
+  const [inviteInput, setInviteInput] = useState("");
 
   const handleCreateTeam = () => {
     router.push("/create-team");
   };
 
-  const handleJoinWithToken = () => {
-    if (inviteToken.trim()) {
-      router.push(`/invite/${inviteToken.trim()}`);
-    }
+  const handleJoinWithInvite = () => {
+    const input = inviteInput.trim();
+    if (!input) return;
+    
+    // Extract token from link format (/invite/xxx) or use as-is
+    const linkMatch = input.match(/\/invite\/([a-f0-9-]+)/i);
+    const token = linkMatch ? linkMatch[1] : input;
+    
+    router.push(`/invite/${token}`);
   };
 
   return (
@@ -63,26 +68,26 @@ export function OnboardingForm({
           <div>
             <h3 className="font-semibold mb-2">Join with Invite</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              Have an invite link? Paste the token here
+              Paste your invite link to join an existing team
             </p>
             <div className="space-y-2">
-              <Label htmlFor="invite-token">Invite Token</Label>
+              <Label htmlFor="invite-input">Invite Link</Label>
               <Input
-                id="invite-token"
-                placeholder="e.g., a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                value={inviteToken}
-                onChange={(e) => setInviteToken(e.target.value)}
+                id="invite-input"
+                placeholder="https://example.com/invite/... or token"
+                value={inviteInput}
+                onChange={(e) => setInviteInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    handleJoinWithToken();
+                    handleJoinWithInvite();
                   }
                 }}
               />
               <Button
-                onClick={handleJoinWithToken}
+                onClick={handleJoinWithInvite}
                 variant="outline"
                 className="w-full gap-2"
-                disabled={!inviteToken.trim()}
+                disabled={!inviteInput.trim()}
               >
                 <LinkIcon size={16} />
                 Join Team
