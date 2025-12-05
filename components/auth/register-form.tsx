@@ -21,6 +21,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useAuthService } from "@/hooks/use-auth-service";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 type RegisterFormValues = {
   name: string;
@@ -72,12 +73,16 @@ export function RegisterForm({
       setSuccess(
         "Account created. Check your email to confirm and then sign in."
       );
+      toast.success("アカウントを作成しました", {
+        description: "メールを確認してログインしてください",
+      });
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
           : "Failed to create account. Please try again.";
       setError(message);
+      toast.error("アカウント作成に失敗しました", { description: message });
     }
   };
 

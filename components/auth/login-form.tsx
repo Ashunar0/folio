@@ -26,6 +26,7 @@ import { useAuthService } from "@/hooks/use-auth-service";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 type LoginFormValues = {
   email: string;
@@ -83,11 +84,13 @@ export function LoginForm({
           // Multiple teams - let user select
           router.push("/select-team");
         }
+        toast.success("ログインしました");
       }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to sign in. Please try again.";
       setError(message);
+      toast.error("ログインに失敗しました", { description: message });
     }
   };
 
