@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = ["/login", "/register", "/logout"];
-  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
+  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route)) || path === "/";
 
   // Auth routes that authenticated users shouldn't access
   const authRoutes = ["/login", "/register"];

@@ -1,21 +1,17 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { LandingHeader } from "@/components/landing/header";
+import { LandingHero } from "@/components/landing/hero";
+import { LandingFeatures } from "@/components/landing/features";
+import { LandingFooter } from "@/components/landing/footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl font-bold">Hello World</h1>
-      <div className="flex flex-col gap-3 mt-6 items-center">
-        <Link href="/login">
-          <Button className="cursor-pointer">Go to login</Button>
-        </Link>
-        <Link
-          href="/test/login"
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-        >
-          Test login (for QA)
-        </Link>
-      </div>
+    <div className="flex min-h-screen flex-col">
+      <LandingHeader />
+      <main className="flex-1">
+        <LandingHero />
+        <LandingFeatures />
+      </main>
+      <LandingFooter />
     </div>
   );
 }
