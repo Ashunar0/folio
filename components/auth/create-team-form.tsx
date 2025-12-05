@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { createTeamSchema, type CreateTeamFormValues } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
@@ -20,12 +21,17 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Plus, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/providers/auth-provider";
+import { useTeam } from "@/providers/team-provider";
 
 export function CreateTeamForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { setTeamId } = useTeam();
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createSupabaseBrowserClient();
 
@@ -46,6 +52,12 @@ export function CreateTeamForm({
       if (error) {
         throw error;
       }
+
+      // Invalidate team cache so team-switcher shows the new team
+      await queryClient.invalidateQueries({ queryKey: ["team-users", user?.id] });
+
+      // Set the new team as active
+      setTeamId(newTeamId);
 
       toast.success("チームを作成しました");
       router.push(`/${newTeamId}/dashboard`);

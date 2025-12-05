@@ -23,6 +23,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { signOut } from "@/lib/auth/api";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { toast } from "sonner";
 
 export function NavUser({
   user,
@@ -36,6 +39,12 @@ export function NavUser({
   const { isMobile } = useSidebar();
 
   const initial = (user.name || user.email || "?").slice(0, 1).toUpperCase();
+
+  const handleLogout = async () => {
+    await signOut(createSupabaseBrowserClient());
+    toast.success("Logged out successfully");
+    window.location.href = "/login";
+  };
 
   return (
     <SidebarMenu>
@@ -93,11 +102,9 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href="/logout" className="flex items-center gap-2">
-                <IconLogout className="text-red-500" />
-                <span className="text-red-500">Log out</span>
-              </Link>
+            <DropdownMenuItem onClick={handleLogout}>
+              <IconLogout className="text-red-500" />
+              <span className="text-red-500">Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
