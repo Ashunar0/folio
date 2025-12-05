@@ -95,3 +95,14 @@ export const createTeamSchema = z.object({
 });
 
 export type CreateTeamFormValues = z.infer<typeof createTeamSchema>;
+
+// --- Invite ---
+export const inviteSchema = z.object({
+  token: z.string().uuid(),
+  teamId: z.string().uuid(),
+  teamName: z.string(),
+  role: z.enum(["admin", "manager", "member", "viewer"]),
+  expiresAt: z.string().nullable().optional(),
+});
+
+export type Invite = z.infer<typeof inviteSchema>;

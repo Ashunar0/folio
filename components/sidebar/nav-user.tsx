@@ -94,8 +94,10 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <IconLogout className="text-red-500" />
-              <span className="text-red-500">Log out</span>
+              <Link href="/logout" className="flex items-center gap-2">
+                <IconLogout className="text-red-500" />
+                <span className="text-red-500">Log out</span>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { useAuthService } from "@/hooks/use-auth-service";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useForm } from "react-hook-form";
 
@@ -38,6 +39,7 @@ export function LoginForm({
   const router = useRouter();
   const { user } = useAuth();
   const { signIn } = useAuthService();
+  const supabase = createSupabaseBrowserClient();
   const {
     register,
     handleSubmit,
@@ -54,7 +56,34 @@ export function LoginForm({
     const password = values.password;
     try {
       await signIn({ email, password });
-      router.push("/main/expense-list");
+      
+      // Check for invite token in sessionStorage
+      const inviteToken = sessionStorage.getItem("folio:invite-token");
+      if (inviteToken) {
+        sessionStorage.removeItem("folio:invite-token");
+        router.push(`/invite/${inviteToken}`);
+        return;
+      }
+
+      // Fetch user's teams to determine redirect
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: teams } = await supabase
+          .from("team_users")
+          .select("team_id")
+          .eq("user_id", user.id);
+
+        if (!teams || teams.length === 0) {
+          // No teams - go to onboarding
+          router.push("/onboarding");
+        } else if (teams.length === 1) {
+          // One team - go directly to dashboard
+          router.push(`/${teams[0].team_id}/dashboard`);
+        } else {
+          // Multiple teams - let user select
+          router.push("/select-team");
+        }
+      }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to sign in. Please try again.";

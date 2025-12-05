@@ -208,4 +208,180 @@ global menu → logout → /login
 * ログイン中：`invite → join`
 * 未ログイン：`invite → login → join`
 
+---
+
+# ✔ 設計方針（確定版）
+
+以下の方針で実装を進める:
+
+1. **招待リンクURL**: `/invite/[token]` (動的ルート)
+2. **招待リンク再利用**: 複数人使用可能（有効期限まで）
+3. **既存メンバーが招待リンクを開いた場合**: 自動的にダッシュボードへリダイレクト + トースト通知
+4. **ロール重複時**: 既存ロールを維持（招待を無視）
+5. **所属チーム0件のユーザー**: `/onboarding` ページへリダイレクト
+6. **存在しないteamId**: 賢いリダイレクト（所属チーム数に応じて適切な画面へ）
+7. **招待リンク有効期限**: 無期限（`expires_at = null`）をデフォルトとする
+8. **チーム作成後**: 即座に新チームのダッシュボードへリダイレクト
+
+---
+
+
+### FB
+
+## ✅ 良い点
+
+1. **フロー設計が非常に明確**
+   - Slack/Notion のベストプラクティスを正しく踏襲
+   - 複数チーム所属を前提とした設計で将来性が高い
+   - エッジケース（所属チーム0件、ログアウト）も考慮済み
+
+2. **招待リンクの扱いが適切**
+   - URL経由での招待を基本とし、自然なUX
+   - Team Switcherは「作成」のみに絞り、役割が明確
+
+## ⚠️ 修正・要検討事項
+
+### 1. **用語の統一**
+- ❌ `team_members` → ✅ `team_users` (実際のテーブル名)
+- ❌ `inviteId` → ✅ `token` (実際のカラム名は `invites.token`)
+
+### 2. **招待リンクの実装詳細が必要**
+現在 `/app/(auth)/invite/page.tsx` は空実装。以下の仕様を決める必要あり:
+
+**URL設計**
+- `/invite/[token]` (動的ルート)
+- または `/invite?token=xxx` (クエリパラメータ)
+
+**inviteToken の保持方法**
+- ✅ **推奨**: URL → sessionStorage (ログイン/登録後も維持)
+- ❌ Cookie: CSRF やサードパーティCookie制限の問題
+- ❌ localStorage: セキュリティリスク
+
+**バリデーション**
+- 招待リンクの有効期限チェック (`invites.expires_at`)
+- すでに参加済みのチームかチェック
+- トークンの存在確認
+
+### 3. **登録後のリダイレクト優先度**
+`/register` 完了後の処理:
+
+```
+1. inviteToken あり → `/invite/[token]` (join confirmation)
+2. inviteToken なし & 所属チーム 0件 → `/create-team`
+3. inviteToken なし & 所属チーム 1件 → `/app/[teamId]/dashboard`
+4. inviteToken なし & 所属チーム 複数 → `/select-team`
+```
+
+現在の `RegisterForm` がこのロジックを持っているか確認が必要。
+
+### 4. **所属チーム0件の扱い**
+`TeamProvider` は所属チーム0件でも動作するが、middleware/auth guardでの扱いを決める:
+
+**option A**: `/create-team` または `/no-team` ページに強制リダイレクト
+**option B**: `/app/[teamId]` 以外はアクセス可能にする
+
+→ **推奨**: option A（常にチーム所属を強制）
+
+### 5. **エッジケースの追加**
+以下も考慮が必要:
+
+**a) 招待リンクが既に使用済み**
+- `invites` テーブルに `used_at` カラムを追加？
+- または使用後に削除？
+
+**b) ロールの重複**
+- すでに admin だが、member として招待された場合
+- → 既存ロールを維持 or アップグレード/ダウングレード？
+
+**c) チーム削除**
+- 所属していたチームが削除された場合
+- → 次回ログイン時に所属チーム0件として処理
+
+**d) teamId の妥当性チェック**
+- URLに存在しない `teamId` が指定された場合
+- → 404 or 所属チーム選択画面にリダイレクト
+
+## 📋 実装タスク（優先順位順）
+
+### Phase 1: 招待フロー基盤
+- [ ] `/app/(auth)/invite/[token]/page.tsx` 実装
+  - トークン検証
+  - チーム情報表示
+  - join confirmation UI
+  - `team_users` への INSERT
+- [ ] `RegisterForm` にリダイレクトロジック追加
+- [ ] `LoginForm` にリダイレクトロジック追加
+- [ ] sessionStorage での inviteToken 管理
+
+### Phase 2: 所属チーム0件対応
+- [ ] middleware での所属チーム0件チェック
+- [ ] `/no-team` または `/onboarding` ページ
+  - 「チームを作成」ボタン
+  - 「招待リンクを持っていますか？」入力欄
+- [ ] `TeamProvider` での0件時の挙動確認
+
+### Phase 3: Team Switcher
+- [ ] "Add Team" ボタンから `/create-team` への導線
+- [ ] チーム作成後の自動切り替え
+
+### Phase 4: エッジケース対応
+- [ ] 招待リンク期限切れ UI
+- [ ] 既に参加済みの場合の処理
+- [ ] 存在しない teamId へのアクセス処理
+- [ ] ロール重複時の処理
+
+### Phase 5: Settings での招待管理
+- [ ] 招待リンク生成 UI (`/app/[teamId]/settings`)
+- [ ] 招待リンク一覧・削除機能
+- [ ] 有効期限設定
+
+## 🔧 DB/RPC 追加の検討
+
+### 推奨: `accept_invite` RPC
+```sql
+create or replace function accept_invite(p_token uuid)
+returns uuid  -- 返り値は team_id
+language plpgsql
+security definer
+as $$
+declare
+  v_invite record;
+  v_team_id uuid;
+begin
+  -- 招待情報を取得
+  select * into v_invite from invites
+  where token = p_token
+    and (expires_at is null or expires_at > now());
+  
+  if not found then
+    raise exception 'Invalid or expired invite token';
+  end if;
+  
+  -- 既に参加済みかチェック
+  if exists (
+    select 1 from team_users
+    where team_id = v_invite.team_id
+      and user_id = auth.uid()
+  ) then
+    -- 既に参加済み → team_id を返す
+    return v_invite.team_id;
+  end if;
+  
+  -- team_users に追加
+  insert into team_users (team_id, user_id, role)
+  values (v_invite.team_id, auth.uid(), v_invite.role);
+  
+  -- 使用済みマーク（optional）
+  -- update invites set used_at = now() where token = p_token;
+  
+  return v_invite.team_id;
+end;
+$$;
+```
+
+## 📝 ドキュメント更新が必要
+
+- [ ] `AGENTS.md` にフロー概要を追加
+- [ ] `.docs/database.md` に招待テーブル詳細追加
+- [ ] API 仕様（`accept_invite` RPC など）
 

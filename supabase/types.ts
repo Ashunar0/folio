@@ -415,6 +415,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_invite: {
+        Args: { p_token: string };
+        Returns: string;
+      };
       approve_expense: {
         Args: { p_approved_by?: string; p_expense_id: string };
         Returns: string;
