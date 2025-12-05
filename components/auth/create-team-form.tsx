@@ -39,7 +39,7 @@ export function CreateTeamForm({
   async function onSubmit(data: CreateTeamFormValues) {
     setIsLoading(true);
     try {
-      const { error } = await supabase.rpc("create_team", {
+      const { data: newTeamId, error } = await supabase.rpc("create_team", {
         name: data.name,
       });
 
@@ -48,7 +48,7 @@ export function CreateTeamForm({
       }
 
       toast.success("チームを作成しました");
-      router.push("/");
+      router.push(`/${newTeamId}/dashboard`);
       router.refresh();
     } catch (error) {
       console.error("Error creating team:", error);

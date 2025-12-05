@@ -7,7 +7,7 @@ export default function Home() {
       <h1 className="text-4xl font-bold">Hello World</h1>
       <div className="flex flex-col gap-3 mt-6 items-center">
         <Link href="/login">
-          <Button>Go to login</Button>
+          <Button className="cursor-pointer">Go to login</Button>
         </Link>
         <Link
           href="/test/login"

@@ -34,7 +34,7 @@ export function SelectTeamForm({
   const handleSubmit = () => {
     if (!selectedTeamId) return;
     setTeamId(selectedTeamId);
-    router.push("/main/expense-list");
+    router.push(`/${selectedTeamId}/dashboard`);
   };
 
   return (
