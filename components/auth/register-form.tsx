@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useAuthService } from "@/hooks/use-auth-service";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -34,6 +35,8 @@ export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
   const { signUp } = useAuthService();
   const {
     register,
@@ -200,7 +203,7 @@ export function RegisterForm({
                   {isSubmitting ? "Creating..." : "Create Account"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Already have an account? <Link href="/login">Sign in</Link>
+                  Already have an account? <Link href={redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login"}>Sign in</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

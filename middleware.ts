@@ -60,7 +60,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check team access for app routes
-  if (user && (path.startsWith("/app/") || path.match(/^\/[a-f0-9-]{36}\//))) {
+  // Skip if user just joined (joined=true query param)
+  const justJoined = request.nextUrl.searchParams.get("joined") === "true";
+  if (user && !justJoined && (path.startsWith("/app/") || path.match(/^\/[a-f0-9-]{36}\//))) {
     // Extract teamId from path
     const teamIdMatch = path.match(/^\/(?:app\/)?([a-f0-9-]{36})/);
     const teamId = teamIdMatch?.[1];

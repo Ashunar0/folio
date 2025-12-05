@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { GoogleLogo } from "./logo";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { useAuthService } from "@/hooks/use-auth-service";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -38,6 +38,8 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
   const { user } = useAuth();
   const { signIn } = useAuthService();
   const supabase = createSupabaseBrowserClient();
@@ -58,6 +60,12 @@ export function LoginForm({
     try {
       await signIn({ email, password });
       
+      // Check for redirect URL from query params
+      if (redirectUrl) {
+        router.push(redirectUrl);
+        return;
+      }
+
       // Check for invite token in sessionStorage
       const inviteToken = sessionStorage.getItem("folio:invite-token");
       if (inviteToken) {
@@ -178,7 +186,9 @@ export function LoginForm({
               </Field>
               <FieldDescription className="text-center">
                 Don&apos;t have an account?{" "}
-                <Link href="/register">Sign up</Link>
+                <Link href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : "/register"}>
+                  Sign up
+                </Link>
               </FieldDescription>
             </FieldGroup>
           </form>

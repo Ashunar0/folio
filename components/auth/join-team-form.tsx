@@ -32,10 +32,22 @@ export function JoinTeamForm({
         throw error;
       }
 
+      // Update localStorage with new teamId so TeamProvider uses it
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id && teamId) {
+        const storageKey = `folio:last-team:${user.id}`;
+        window.localStorage.setItem(storageKey, teamId);
+      }
+
       toast.success(`${invite.teamName}に参加しました`);
       
-      // Force full page reload to update TeamProvider cache
-      window.location.href = `/${teamId}/dashboard`;
+      console.log("Joined team:", teamId);
+      
+      // Wait a bit to ensure DB propagation before redirecting
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Force full page reload with joined=true to bypass middleware membership check
+      window.location.href = `/${teamId}/dashboard?joined=true`;
     } catch (error) {
       console.error("Error joining team:", error);
       toast.error("チームへの参加に失敗しました");
