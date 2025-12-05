@@ -5,6 +5,7 @@ import { AppProviders } from "@/providers/app-provider";
 import { SupabaseProvider } from "@/providers/supabase-provider";
 import { AuthProvider } from "@/providers/auth-provider";
 import { TeamProvider } from "@/providers/team-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
             <AuthProvider>
               <TeamProvider defaultTeamId={defaultTeamId}>
                 {children}
+                <Toaster position="top-right" />
               </TeamProvider>
             </AuthProvider>
           </SupabaseProvider>

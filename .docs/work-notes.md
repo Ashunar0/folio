@@ -88,3 +88,29 @@
 
 - **Users Page Actions**: Member/viewer roles now completely hide edit/delete buttons instead of just disabling them
   - Modified `app/(app)/[teamId]/users/column.tsx` to conditionally render actions based on `canManage` flag
+
+## Dashboard Implementation
+
+- **Summary Cards** (`components/dashboard/summary-cards.tsx`)
+  - Total Balance: 全期間の収支合計（収入 - 支出）
+  - This Month's Expense: 今月の支出（前月比表示）
+  - This Month's Income: 今月の収入（前月比表示）
+  - Pending Approvals: 承認待ちの経費件数
+
+- **Charts** (`components/dashboard/monthly-chart.tsx`, `category-pie.tsx`)
+  - Monthly Trend: 過去6ヶ月の収入・支出の棒グラフ（recharts使用）
+  - Category Breakdown: 今月の支出カテゴリ別円グラフ（上位5カテゴリ + その他）
+
+- **Activity Lists** (`components/dashboard/recent-activity.tsx`, `pending-approvals.tsx`)
+  - Recent Activity: 直近5件のトランザクション
+  - Pending Approvals: 承認待ちの経費（全ユーザーに表示）
+
+- **API Hooks** (`lib/api/dashboard.ts`)
+  - `useTotalBalance`: 全期間の収支合計を計算
+  - `useDashboardSummary`: 今月・先月の支出・収入を計算
+  - `useMonthlyChart`: 過去6ヶ月の月別集計データ
+  - `useCategoryBreakdown`: カテゴリ別支出を集計
+
+- **User Sheet Fix**
+  - Member/viewer roles: Edit button is now hidden instead of disabled
+  - Modified conditional rendering in `components/sheets/user-sheet.tsx`

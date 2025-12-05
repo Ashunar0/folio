@@ -44,6 +44,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useUpdateExpense } from "@/lib/api/expenses";
+import { toast } from "sonner";
 
 const statusMap: Record<string, string> = {
   draft: "下書き",
@@ -124,9 +125,17 @@ export function ExpenseSheet({
 
   const onSave = async (data: ExpenseFormValues) => {
     setSaveError(null);
+    const isSubmitting = data.status === "submitted";
     try {
       await updateExpense.mutateAsync(data as Expense);
       setIsEditMode(false);
+      if (isSubmitting) {
+        toast.success("申請を提出しました", {
+          description: "承認をお待ちください",
+        });
+      } else {
+        toast.success("下書きを保存しました");
+      }
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -135,6 +144,9 @@ export function ExpenseSheet({
             ? err
             : "保存に失敗しました";
       setSaveError(message);
+      toast.error("保存に失敗しました", {
+        description: message,
+      });
     }
   };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, JapaneseYen, SendIcon, UploadCloud } from "lucide-react";
@@ -37,6 +37,7 @@ import { useSupabase } from "@/providers/supabase-provider";
 import { useTeam } from "@/providers/team-provider";
 import { useCreateExpense } from "@/lib/api/expenses";
 import { useCategories } from "@/lib/api/categories";
+import { toast } from "sonner";
 
 export default function ExpenseFormClient() {
   const supabase = useSupabase();
@@ -46,13 +47,12 @@ export default function ExpenseFormClient() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [categoryOptions, setCategoryOptions] = useState<
     { id: string; name: string; type: "expense" | "income" }[]
   >([]);
 
   const form = useForm<ExpenseFormInput>({
-    resolver: zodResolver(expenseFormSchema),
+    resolver: zodResolver(expenseFormSchema) as Resolver<ExpenseFormInput>,
     defaultValues: {
       date: format(new Date(), "yyyy-MM-dd"),
       amount: 0,
@@ -96,11 +96,10 @@ export default function ExpenseFormClient() {
 
   const onSubmit = async (data: ExpenseFormInput) => {
     setSubmitError(null);
-    setSubmitSuccess(null);
     try {
-      if (!teamId) throw new Error("チームを選択してください");
+      if (!teamId) throw new Error("Select a team");
       await createExpense.mutateAsync(data);
-      setSubmitSuccess("申請を受け付けました");
+      toast.success("Expense submitted successfully");
       form.reset({
         date: format(new Date(), "yyyy-MM-dd"),
         amount: 0,
@@ -116,9 +115,12 @@ export default function ExpenseFormClient() {
         err instanceof Error
           ? err.message
           : typeof err === "string"
-            ? err
-            : "申請に失敗しました";
+          ? err
+          : "Failed to submit expense";
       setSubmitError(message);
+      toast.error("Failed to submit expense", {
+        description: message,
+      });
     }
   };
 
@@ -363,8 +365,8 @@ export default function ExpenseFormClient() {
                             err instanceof Error
                               ? err.message
                               : typeof err === "string"
-                                ? err
-                                : "アップロードに失敗しました";
+                              ? err
+                              : "アップロードに失敗しました";
                           setUploadError(message);
                         } finally {
                           setIsUploading(false);
@@ -387,12 +389,7 @@ export default function ExpenseFormClient() {
             )}
           />
 
-          {submitError && (
-            <p className="text-sm text-red-600">{submitError}</p>
-          )}
-          {submitSuccess && (
-            <p className="text-sm text-emerald-600">{submitSuccess}</p>
-          )}
+          {submitError && <p className="text-sm text-red-600">{submitError}</p>}
           <div className="flex justify-end">
             <Button
               type="submit"
