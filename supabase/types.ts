@@ -419,6 +419,10 @@ export type Database = {
         Args: { p_approved_by?: string; p_expense_id: string };
         Returns: string;
       };
+      create_team: {
+        Args: { name: string };
+        Returns: string;
+      };
       has_role: {
         Args: { allowed_roles: string[]; target_team: string };
         Returns: boolean;

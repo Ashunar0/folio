@@ -86,4 +86,12 @@ export const userSchema = z.object({
   lastLogin: z.string().nullable(),
 });
 
+
 export type User = z.infer<typeof userSchema>;
+
+// --- Create Team ---
+export const createTeamSchema = z.object({
+  name: z.string().min(1, "チーム名を入力してください").max(50, "チーム名は50文字以内で入力してください"),
+});
+
+export type CreateTeamFormValues = z.infer<typeof createTeamSchema>;
