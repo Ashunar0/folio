@@ -80,28 +80,30 @@ export const userColumns: ColumnDef<User>[] = [
               <IconEye size={16} />
               <span>View</span>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onEdit?.(row.original);
-              }}
-              disabled={!canManage}
-            >
-              <IconPencil size={16} />
-              <span>Edit</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onDelete?.(row.original);
-              }}
-              disabled={!canManage}
-            >
-              <IconTrash size={16} />
-              <span>Delete</span>
-            </DropdownMenuItem>
+            {canManage && (
+              <>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    meta?.onEdit?.(row.original);
+                  }}
+                >
+                  <IconPencil size={16} />
+                  <span>Edit</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    meta?.onDelete?.(row.original);
+                  }}
+                >
+                  <IconTrash size={16} />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );

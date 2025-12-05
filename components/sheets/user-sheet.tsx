@@ -117,11 +117,8 @@ export function UserSheet({
 
         <div className="flex flex-col gap-4 p-4 text-sm">
           <div className="flex justify-end">
-            {!isEditMode && (
-              <Button
-                onClick={() => canEdit && setIsEditMode(true)}
-                disabled={!canEdit}
-              >
+            {!isEditMode && canEdit && (
+              <Button onClick={() => setIsEditMode(true)}>
                 <IconPencil size={16} />
                 <span>Edit</span>
               </Button>
