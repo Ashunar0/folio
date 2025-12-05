@@ -1,3 +1,5 @@
+import DashboardClient from "./client";
+
 export default function DashboardPage() {
-  return <div>Dashboard</div>;
+  return <DashboardClient />;
 }
