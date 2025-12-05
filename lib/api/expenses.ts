@@ -58,11 +58,11 @@ export function useExpenses() {
           profiles:profiles!expenses_created_by_fkey ( name )
         `
         )
-        .eq("team_id", teamId)
+        .eq("team_id", teamId!)
         .order("date", { ascending: false });
 
       if (error) throw error;
-      return (data ?? []).map(mapExpense);
+      return ((data ?? []) as ExpenseRow[]).map(mapExpense);
     },
   });
 }
@@ -120,7 +120,7 @@ export function useCreateExpense() {
       const eventId = await resolveEventId(supabase, teamId!, input.event ?? null);
 
       const { error } = await supabase.from("expenses").insert({
-        team_id: teamId,
+        team_id: teamId!,
         date: input.date,
         amount: input.amount,
         type: input.type,
@@ -184,7 +184,7 @@ export function useUpdateExpense(expense?: Expense | null) {
           updated_at: new Date().toISOString(),
         })
         .eq("id", expense.id)
-        .eq("team_id", teamId);
+        .eq("team_id", teamId!);
 
       if (error) throw error;
     },

@@ -36,10 +36,10 @@ export function useUsers() {
       const { data, error } = await supabase
         .from("team_users")
         .select("user_id, role, created_at, profiles(name, email)")
-        .eq("team_id", teamId);
+        .eq("team_id", teamId!);
 
       if (error) throw error;
-      return (data ?? []).map(mapUser);
+      return ((data ?? []) as TeamUserRow[]).map(mapUser);
     },
   });
 }
@@ -59,7 +59,7 @@ export function useUpdateUserRole() {
       const { error } = await supabase
         .from("team_users")
         .update({ role: params.role })
-        .eq("team_id", teamId)
+        .eq("team_id", teamId!)
         .eq("user_id", params.userId);
 
       if (error) throw error;

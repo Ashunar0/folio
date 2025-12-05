@@ -64,7 +64,7 @@ export function useApprovalList() {
         .order("date", { ascending: false });
 
       if (error) throw error;
-      return (data ?? []).map(mapExpense);
+      return ((data ?? []) as ApprovalExpenseRow[]).map(mapExpense);
     },
   });
 }

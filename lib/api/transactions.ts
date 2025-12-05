@@ -53,11 +53,11 @@ export function useTransactions() {
           profiles:profiles!transactions_created_by_fkey ( name )
         `
         )
-        .eq("team_id", teamId)
+        .eq("team_id", teamId!)
         .order("date", { ascending: false });
 
       if (error) throw error;
-      return (data ?? []).map(mapTransaction);
+      return ((data ?? []) as TransactionRow[]).map(mapTransaction);
     },
   });
 }

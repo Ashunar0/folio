@@ -210,3 +210,43 @@
 - `components/auth/onboarding-form.tsx`
 - `components/sidebar/team-switcher.tsx`
 - `middleware.ts`
+
+## Build Error Fixes (2025-12-06)
+
+### Lint Errors
+- **Unused imports/variables**: Removed `ExternalLink`, `Pen`, `GoogleLogo`, `ChangeIndicator`, `TransactionRow`
+- **`any` type errors**: 
+  - `client.tsx`: Created `InviteRow` type for `initialInvitations`
+  - `invites.ts`: Created `Invite` type for `CreateInviteResult.invite`
+- **Unescaped entities**: Changed `'` to `&apos;` in JSX text (`This Month's Expense/Income`)
+
+### TypeScript Build Errors
+- **`teamId` null check errors**: Added non-null assertion (`!`) after `assertTeamSelected(teamId)` calls
+  - `lib/api/expenses.ts`: 3 locations
+  - `lib/api/transactions.ts`: 1 location
+  - `lib/api/users.ts`: 2 locations
+  - `lib/api/approvals.tsx`: 1 location
+- **Supabase type inference**: Added explicit type casts for query results
+  - `(data ?? []) as ExpenseRow[]`
+  - `(data ?? []) as TransactionRow[]`
+  - `(data ?? []) as TeamUserRow[]`
+  - `(data ?? []) as ApprovalExpenseRow[]`
+
+### SSR/Suspense Errors
+- **`useSearchParams()` without Suspense**: Next.js 15+ requires Suspense boundary
+  - `app/(auth)/login/page.tsx`: Wrapped `LoginForm` in `<Suspense>`
+  - `app/(auth)/register/page.tsx`: Wrapped `RegisterForm` in `<Suspense>`
+
+### Files Changed
+- `lib/api/approvals.tsx`
+- `lib/api/expenses.ts`
+- `lib/api/transactions.ts`
+- `lib/api/users.ts`
+- `lib/actions/invites.ts`
+- `app/(app)/[teamId]/settings/client.tsx`
+- `app/(auth)/login/page.tsx`
+- `app/(auth)/register/page.tsx`
+- `components/auth/login-form.tsx`
+- `components/dashboard/summary-cards.tsx`
+- `lib/api/dashboard.ts`
+
