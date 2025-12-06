@@ -126,7 +126,11 @@ export function TeamSwitcher() {
             {teams.map((team, index) => (
               <DropdownMenuItem
                 key={team.id}
-                onClick={() => setTeamId(team.id)}
+                onClick={() => {
+                  setTeamId(team.id);
+                  // チーム切り替え時は必ずダッシュボードに遷移（権限のないページへのアクセスを防止）
+                  router.push(`/${team.id}/dashboard`);
+                }}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border text-xs font-semibold">
