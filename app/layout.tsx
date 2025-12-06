@@ -1,5 +1,5 @@
+import localFont from "next/font/local";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Noto_Sans_JP } from "next/font/google";
 import "@/styles/globals.css";
 import { AppProviders } from "@/providers/app-provider";
 import { SupabaseProvider } from "@/providers/supabase-provider";
@@ -7,25 +7,35 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { TeamProvider } from "@/providers/team-provider";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: "../public/fonts/Geist-Variable.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+  weight: "100 900",
+  style: "normal",
   display: "swap",
 });
 
-const notoSansJP = Noto_Sans_JP({
+const geistMono = localFont({
+  src: "../public/fonts/GeistMono-Variable.woff2",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+  style: "normal",
+  display: "swap",
+});
+
+const inter = localFont({
+  src: "../public/fonts/Inter-VariableFont.ttf",
+  variable: "--font-inter",
+  weight: "100 900",
+  style: "normal",
+  display: "swap",
+});
+
+const notoSansJP = localFont({
+  src: "../public/fonts/NotoSansJP-VariableFont.ttf",
   variable: "--font-noto-sans-jp",
-  subsets: ["latin"],
+  weight: "100 900",
+  style: "normal",
   display: "swap",
 });
 

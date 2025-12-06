@@ -3,7 +3,12 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-export function LandingHero() {
+interface LandingHeroProps {
+  isAuthenticated?: boolean;
+  dashboardUrl?: string;
+}
+
+export function LandingHero({ isAuthenticated, dashboardUrl = "/onboarding" }: LandingHeroProps) {
   return (
     <section className="container mx-auto flex flex-col items-center justify-center gap-6 py-24 text-center md:py-32">
       <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm text-muted-foreground">
@@ -21,16 +26,26 @@ export function LandingHero() {
         面倒なスプレッドシート管理から解放されましょう。
       </p>
       <div className="flex flex-col gap-4 sm:flex-row">
-        <Link href="/register">
-          <Button size="lg" className="gap-2">
-            無料で始める <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
-        <Link href="/login">
-          <Button variant="outline" size="lg">
-            ログイン
-          </Button>
-        </Link>
+        {isAuthenticated ? (
+          <Link href={dashboardUrl}>
+            <Button size="lg" className="gap-2">
+              ダッシュボードへ <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        ) : (
+          <>
+            <Link href="/register">
+              <Button size="lg" className="gap-2">
+                無料で始める <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" size="lg">
+                ログイン
+              </Button>
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Dashboard Screenshot */}
