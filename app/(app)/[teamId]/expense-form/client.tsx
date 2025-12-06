@@ -4,11 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import dynamic from "next/dynamic";
 import { CalendarIcon, JapaneseYen, SendIcon, UploadCloud } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -38,6 +38,20 @@ import { useTeam } from "@/providers/team-provider";
 import { useCreateExpense } from "@/lib/api/expenses";
 import { useCategories } from "@/lib/api/categories";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+
+const Calendar = dynamic(
+  () =>
+    import("@/components/ui/calendar").then((mod) => mod.Calendar),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[300px] items-center justify-center">
+        <Spinner className="h-5 w-5" />
+      </div>
+    ),
+  }
+);
 
 export default function ExpenseFormClient() {
   const supabase = useSupabase();

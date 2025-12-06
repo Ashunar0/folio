@@ -37,7 +37,6 @@ import { useForm, type Resolver } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
@@ -45,6 +44,21 @@ import {
 } from "@/components/ui/popover";
 import { useUpdateExpense } from "@/lib/api/expenses";
 import { toast } from "sonner";
+import dynamic from "next/dynamic";
+import { Spinner } from "@/components/ui/spinner";
+
+const Calendar = dynamic(
+  () =>
+    import("@/components/ui/calendar").then((mod) => mod.Calendar),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[300px] items-center justify-center">
+        <Spinner className="h-5 w-5" />
+      </div>
+    ),
+  }
+);
 
 const statusMap: Record<string, string> = {
   draft: "下書き",

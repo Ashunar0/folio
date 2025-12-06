@@ -41,13 +41,27 @@ import { useForm, type Resolver } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { JapaneseYen } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Spinner } from "@/components/ui/spinner";
+
+const Calendar = dynamic(
+  () =>
+    import("@/components/ui/calendar").then((mod) => mod.Calendar),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[300px] items-center justify-center">
+        <Spinner className="h-5 w-5" />
+      </div>
+    ),
+  }
+);
 
 type TransactionSheetProps = {
   open: boolean;
