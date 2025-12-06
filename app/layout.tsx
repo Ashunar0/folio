@@ -1,11 +1,6 @@
 import localFont from "next/font/local";
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import { AppProviders } from "@/providers/app-provider";
-import { SupabaseProvider } from "@/providers/supabase-provider";
-import { AuthProvider } from "@/providers/auth-provider";
-import { TeamProvider } from "@/providers/team-provider";
-import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "../public/fonts/Geist-Variable.woff2",
@@ -53,25 +48,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const defaultTeamId =
-    process.env.NEXT_PUBLIC_SUPABASE_DEFAULT_TEAM_ID ?? null;
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${notoSansJP.variable} antialiased`}
         suppressHydrationWarning
       >
-        <AppProviders>
-          <SupabaseProvider>
-            <AuthProvider>
-              <TeamProvider defaultTeamId={defaultTeamId}>
-                {children}
-                <Toaster position="top-right" />
-              </TeamProvider>
-            </AuthProvider>
-          </SupabaseProvider>
-        </AppProviders>
+        {children}
       </body>
     </html>
   );

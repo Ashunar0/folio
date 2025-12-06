@@ -18,6 +18,11 @@
 - Tablerアイコンを廃止し、lucideに統一。`lib/icons.ts` で既存のIcon名前をlucideにマップし、全コンポーネントのimportを置換。
 - `@tabler/icons-react` 依存を削除し、クライアントJSの重複を削減。
 
+### プロバイダーのチャンク分離
+- `app/layout.tsx` から Supabase/Auth/Team の各Providerを外し、`(app)` / `(auth)` / `me` の各レイアウトで `AppShellProviders` を噛ませる構造へ分離。
+- 認証・アプリ画面のみが Supabase クライアントの巨大チャンク（`static/chunks/9920-...`）を読むようになり、LP（`/`）の初期JSから除外。
+- `(auth)` レイアウトも TeamProvider を含め直し、`/create-team` などでの `useTeam` エラーを防止。
+
 ### 現状の確認コマンド
 - ビルド: `npm run build`（webpack）
 - バンドル解析: `ANALYZE=true npx next build --webpack` → `.next/analyze/client.html`
