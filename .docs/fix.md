@@ -27,6 +27,9 @@
 - 承認/経費一覧/取引/メンバー一覧のクライアントエントリで `DataTable` と各シートを `next/dynamic` 化し、TanStack React Table や Zod + React Day Picker を初期チャンクから外すようにした（シートは開いたときだけロード）。
 - これにより `.next/analyze/client.html` で大きかった `static/chunks/4731-...`（Zod + locales）と `static/chunks/3583-...`（react-day-picker）、`static/chunks/8576-...`（table-core + dialog/icons）が初期ロードから外れ、一覧画面初回のJS量を削減。
 
+### フォームページの遅延読込
+- 経費申請フォーム（`/[teamId]/expense-form`）とチーム作成フォーム（`/create-team`）をサーバーエントリから分離し、クライアント側で `next/dynamic(ssr:false)` による遅延読込へ。Zod/React Hook Form/Supabase RPC 呼び出しをフォームを開いたときだけロードする形にし、トップレベルの初期JSから外した。
+
 ### 現状の確認コマンド
 - ビルド: `npm run build`（webpack）
 - バンドル解析: `ANALYZE=true npx next build --webpack` → `.next/analyze/client.html`
