@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { userColumns } from "./column";
 import { User } from "@/lib/schemas";
+import type { DataTableProps } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { useUsers } from "@/lib/api/users";
@@ -12,8 +13,13 @@ import { useAuth } from "@/providers/auth-provider";
 import { useTeam } from "@/providers/team-provider";
 import { Spinner } from "@/components/ui/spinner";
 
-const DataTable = dynamic(
-  () => import("@/components/data-table").then((mod) => mod.DataTable),
+const UsersDataTable = dynamic(
+  async () => {
+    const mod = await import("@/components/data-table");
+    return function UsersDataTable(props: DataTableProps<User>) {
+      return <mod.DataTable<User> {...props} />;
+    };
+  },
   {
     loading: () => (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -85,7 +91,7 @@ export default function UsersClient() {
         )}
       </div>
       
-      <DataTable
+      <UsersDataTable
         data={data ?? []}
         columns={userColumns}
         onRowClick={handleRowClick}

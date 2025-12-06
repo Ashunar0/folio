@@ -3,14 +3,22 @@
 import dynamic from "next/dynamic";
 import { columns } from "./columns";
 import { Transaction } from "@/lib/schemas";
+import type { DataTableProps } from "@/components/data-table";
 import { useTransactions } from "@/lib/api/transactions";
 import { useAuth } from "@/providers/auth-provider";
 import { useTeam } from "@/providers/team-provider";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 
-const DataTable = dynamic(
-  () => import("@/components/data-table").then((mod) => mod.DataTable),
+const TransactionDataTable = dynamic(
+  async () => {
+    const mod = await import("@/components/data-table");
+    return function TransactionDataTable(
+      props: DataTableProps<Transaction>
+    ) {
+      return <mod.DataTable<Transaction> {...props} />;
+    };
+  },
   {
     loading: () => (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -86,7 +94,7 @@ export default function TransactionsClient() {
           No team selected. Join or create a team.
         </p>
       )}
-      <DataTable
+      <TransactionDataTable
         data={data ?? []}
         columns={columns}
         onRowClick={handleRowClick}

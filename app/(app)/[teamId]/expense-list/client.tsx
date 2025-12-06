@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import Image from "next/image";
+import type { DataTableProps } from "@/components/data-table";
 
 import { columns } from "./columns";
 import { Expense } from "@/lib/schemas";
@@ -19,8 +20,13 @@ import {
 import { useSupabase } from "@/providers/supabase-provider";
 import { Spinner } from "@/components/ui/spinner";
 
-const DataTable = dynamic(
-  () => import("@/components/data-table").then((mod) => mod.DataTable),
+const ExpenseDataTable = dynamic(
+  async () => {
+    const mod = await import("@/components/data-table");
+    return function ExpenseDataTable(props: DataTableProps<Expense>) {
+      return <mod.DataTable<Expense> {...props} />;
+    };
+  },
   {
     loading: () => (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -122,7 +128,7 @@ export default function ExpenseListClient() {
           No team selected. Join or create a team.
         </p>
       )}
-      <DataTable
+      <ExpenseDataTable
         data={data ?? []}
         columns={columns}
         onRowClick={handleRowClick}

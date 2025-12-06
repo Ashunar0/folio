@@ -58,7 +58,7 @@ export type FilterConfig = {
   options: { value: string; label: string }[];
 };
 
-type DataTableProps<TData> = {
+export type DataTableProps<TData> = {
   data: TData[];
   columns?: ColumnDef<TData, unknown>[];
   onRowClick?: (row: TData) => void;

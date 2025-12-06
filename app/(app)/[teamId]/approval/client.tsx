@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { approvalColumns } from "./columns";
 import { Expense } from "@/lib/schemas";
+import type { DataTableProps } from "@/components/data-table";
 import { useState } from "react";
 import { useApprovalList } from "@/lib/api/approvals";
 import { useAuth } from "@/providers/auth-provider";
@@ -18,8 +19,13 @@ import { useSupabase } from "@/providers/supabase-provider";
 import { Spinner } from "@/components/ui/spinner";
 import Image from "next/image";
 
-const DataTable = dynamic(
-  () => import("@/components/data-table").then((mod) => mod.DataTable),
+const ApprovalDataTable = dynamic(
+  async () => {
+    const mod = await import("@/components/data-table");
+    return function ApprovalDataTable(props: DataTableProps<Expense>) {
+      return <mod.DataTable<Expense> {...props} />;
+    };
+  },
   {
     loading: () => (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -104,7 +110,7 @@ export default function ApprovalClient() {
           No team selected. Join or create a team.
         </p>
       )}
-      <DataTable
+      <ApprovalDataTable
         data={data ?? []}
         columns={approvalColumns}
         onRowClick={handleRowClick}
