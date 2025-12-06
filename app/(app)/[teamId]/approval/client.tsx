@@ -1,9 +1,8 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
+import dynamic from "next/dynamic";
 import { approvalColumns } from "./columns";
 import { Expense } from "@/lib/schemas";
-import { ApprovalSheet } from "@/components/sheets/approval-sheet";
 import { useState } from "react";
 import { useApprovalList } from "@/lib/api/approvals";
 import { useAuth } from "@/providers/auth-provider";
@@ -18,6 +17,26 @@ import {
 import { useSupabase } from "@/providers/supabase-provider";
 import { Spinner } from "@/components/ui/spinner";
 import Image from "next/image";
+
+const DataTable = dynamic(
+  () => import("@/components/data-table").then((mod) => mod.DataTable),
+  {
+    loading: () => (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner className="h-4 w-4" />
+        <span>テーブルを準備中...</span>
+      </div>
+    ),
+  }
+);
+
+const ApprovalSheet = dynamic(
+  () =>
+    import("@/components/sheets/approval-sheet").then(
+      (mod) => mod.ApprovalSheet
+    ),
+  { loading: () => null }
+);
 
 export default function ApprovalClient() {
   const { authLoading } = useAuth();

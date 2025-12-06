@@ -23,6 +23,10 @@
 - 認証・アプリ画面のみが Supabase クライアントの巨大チャンク（`static/chunks/9920-...`）を読むようになり、LP（`/`）の初期JSから除外。
 - `(auth)` レイアウトも TeamProvider を含め直し、`/create-team` などでの `useTeam` エラーを防止。
 
+### テーブル/シートまわりの遅延読込
+- 承認/経費一覧/取引/メンバー一覧のクライアントエントリで `DataTable` と各シートを `next/dynamic` 化し、TanStack React Table や Zod + React Day Picker を初期チャンクから外すようにした（シートは開いたときだけロード）。
+- これにより `.next/analyze/client.html` で大きかった `static/chunks/4731-...`（Zod + locales）と `static/chunks/3583-...`（react-day-picker）、`static/chunks/8576-...`（table-core + dialog/icons）が初期ロードから外れ、一覧画面初回のJS量を削減。
+
 ### 現状の確認コマンド
 - ビルド: `npm run build`（webpack）
 - バンドル解析: `ANALYZE=true npx next build --webpack` → `.next/analyze/client.html`

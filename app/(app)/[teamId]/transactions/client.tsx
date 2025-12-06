@@ -1,13 +1,33 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
+import dynamic from "next/dynamic";
 import { columns } from "./columns";
 import { Transaction } from "@/lib/schemas";
 import { useTransactions } from "@/lib/api/transactions";
 import { useAuth } from "@/providers/auth-provider";
 import { useTeam } from "@/providers/team-provider";
-import { TransactionSheet } from "@/components/sheets/transaction-sheet";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
+
+const DataTable = dynamic(
+  () => import("@/components/data-table").then((mod) => mod.DataTable),
+  {
+    loading: () => (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner className="h-4 w-4" />
+        <span>テーブルを準備中...</span>
+      </div>
+    ),
+  }
+);
+
+const TransactionSheet = dynamic(
+  () =>
+    import("@/components/sheets/transaction-sheet").then(
+      (mod) => mod.TransactionSheet
+    ),
+  { loading: () => null }
+);
 
 export default function TransactionsClient() {
   const { authLoading, user } = useAuth();

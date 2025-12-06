@@ -1,13 +1,14 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
+import dynamic from "next/dynamic";
+import { useState } from "react";
+import Image from "next/image";
+
 import { columns } from "./columns";
 import { Expense } from "@/lib/schemas";
 import { useExpenses } from "@/lib/api/expenses";
 import { useAuth } from "@/providers/auth-provider";
 import { useTeam } from "@/providers/team-provider";
-import { ExpenseSheet } from "@/components/sheets/expense-sheet";
-import { useState } from "react";
 import { DestructiveAlert } from "@/components/ui/alert-toast";
 import {
   Dialog,
@@ -17,7 +18,26 @@ import {
 } from "@/components/ui/dialog";
 import { useSupabase } from "@/providers/supabase-provider";
 import { Spinner } from "@/components/ui/spinner";
-import Image from "next/image";
+
+const DataTable = dynamic(
+  () => import("@/components/data-table").then((mod) => mod.DataTable),
+  {
+    loading: () => (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner className="h-4 w-4" />
+        <span>テーブルを準備中...</span>
+      </div>
+    ),
+  }
+);
+
+const ExpenseSheet = dynamic(
+  () =>
+    import("@/components/sheets/expense-sheet").then(
+      (mod) => mod.ExpenseSheet
+    ),
+  { loading: () => null }
+);
 
 export default function ExpenseListClient() {
   const { authLoading, user } = useAuth();

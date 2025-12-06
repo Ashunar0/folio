@@ -1,16 +1,33 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { DataTable } from "@/components/data-table";
 import { userColumns } from "./column";
-import { UserSheet } from "@/components/sheets/user-sheet";
 import { User } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { useUsers } from "@/lib/api/users";
 import { useAuth } from "@/providers/auth-provider";
 import { useTeam } from "@/providers/team-provider";
+import { Spinner } from "@/components/ui/spinner";
+
+const DataTable = dynamic(
+  () => import("@/components/data-table").then((mod) => mod.DataTable),
+  {
+    loading: () => (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner className="h-4 w-4" />
+        <span>テーブルを準備中...</span>
+      </div>
+    ),
+  }
+);
+
+const UserSheet = dynamic(
+  () => import("@/components/sheets/user-sheet").then((mod) => mod.UserSheet),
+  { loading: () => null }
+);
 
 export default function UsersClient() {
   const router = useRouter();
