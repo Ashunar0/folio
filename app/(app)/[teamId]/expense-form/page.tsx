@@ -1,4 +1,4 @@
-import ExpenseFormClient from "./client";
+import ExpenseFormLazy from "./expense-form-lazy";
 
 export const metadata = {
   title: "Expense Form",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function ExpenseFormPage() {
-  return <ExpenseFormClient />;
+  return <ExpenseFormLazy />;
 }
