@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IconDotsVertical, IconEye } from "@tabler/icons-react";
+import { IconDotsVertical, IconEye } from "@/lib/icons";
 import { Link2 } from "lucide-react";
 import { Expense } from "@/lib/schemas";
 

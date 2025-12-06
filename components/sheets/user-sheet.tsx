@@ -26,7 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { IconPencil } from "@tabler/icons-react";
+import { IconPencil } from "@/lib/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
 import { User, userSchema } from "@/lib/schemas";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { IconUser, IconKey, IconPalette, IconBell } from "@tabler/icons-react";
+import { IconUser, IconKey, IconPalette, IconBell } from "@/lib/icons";
 import { ChevronLeft } from "lucide-react";
 
 import { NavGroup } from "@/components/sidebar/nav-group";

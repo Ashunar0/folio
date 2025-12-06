@@ -2,14 +2,6 @@
 
 import * as React from "react";
 import {
-  IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconLayoutColumns,
-} from "@tabler/icons-react";
-import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
@@ -23,6 +15,14 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import {
+  IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronsLeft,
+  IconChevronsRight,
+  IconLayoutColumns,
+} from "@/lib/icons";
 import { Search, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

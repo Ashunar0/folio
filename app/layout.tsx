@@ -32,9 +32,10 @@ const inter = localFont({
 });
 
 const notoSansJP = localFont({
-  src: "../public/fonts/NotoSansJP-VariableFont.ttf",
+  // JPは常用漢字が中心の400のみバンドルしてサイズを抑える
+  src: "../public/fonts/NotoSansJP-400.ttf",
   variable: "--font-noto-sans-jp",
-  weight: "100 900",
+  weight: "400",
   style: "normal",
   display: "swap",
 });

@@ -16,7 +16,7 @@ import {
   IconEye,
   IconPencil,
   IconTrash,
-} from "@tabler/icons-react";
+} from "@/lib/icons";
 import { Link2 } from "lucide-react";
 import { Expense } from "@/lib/schemas";
 

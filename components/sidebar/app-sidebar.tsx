@@ -11,7 +11,7 @@ import {
   IconSettingsCog,
   IconCategory,
   IconCalendar,
-} from "@tabler/icons-react";
+} from "@/lib/icons";
 
 import { NavGroup } from "@/components/sidebar/nav-group";
 import { NavUser } from "@/components/sidebar/nav-user";

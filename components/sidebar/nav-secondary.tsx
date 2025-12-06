@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { IconLogout, type Icon } from "@tabler/icons-react";
+import { IconLogout, type Icon } from "@/lib/icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

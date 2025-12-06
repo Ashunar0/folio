@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTransactions } from "@/lib/api/transactions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { IconArrowDownRight, IconArrowUpRight } from "@tabler/icons-react";
+import { IconArrowDownRight, IconArrowUpRight } from "@/lib/icons";
 import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import { useTeam } from "@/providers/team-provider";

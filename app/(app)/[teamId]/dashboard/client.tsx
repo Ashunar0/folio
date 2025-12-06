@@ -1,10 +1,42 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
-import { MonthlyChart } from "@/components/dashboard/monthly-chart";
-import { CategoryPie } from "@/components/dashboard/category-pie";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { PendingApprovals } from "@/components/dashboard/pending-approvals";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ChartSkeleton = ({ title }: { title: string }) => (
+  <Card>
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-[300px] w-full" />
+    </CardContent>
+  </Card>
+);
+
+const MonthlyChart = dynamic(
+  () =>
+    import("@/components/dashboard/monthly-chart").then(
+      (mod) => mod.MonthlyChart
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton title="Monthly Trend" />,
+  }
+);
+
+const CategoryPie = dynamic(
+  () =>
+    import("@/components/dashboard/category-pie").then((mod) => mod.CategoryPie),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton title="Category Breakdown" />,
+  }
+);
 
 export default function DashboardClient() {
   return (

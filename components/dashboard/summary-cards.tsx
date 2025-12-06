@@ -6,7 +6,7 @@ import {
   IconArrowUpRight,
   IconWallet,
   IconClockHour4,
-} from "@tabler/icons-react";
+} from "@/lib/icons";
 import {
   useDashboardSummary,
   useTotalBalance,

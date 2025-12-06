@@ -9,7 +9,7 @@ import {
   IconEye,
   IconPencil,
   IconTrash,
-} from "@tabler/icons-react";
+} from "@/lib/icons";
 
 import { Button } from "@/components/ui/button";
 import {
