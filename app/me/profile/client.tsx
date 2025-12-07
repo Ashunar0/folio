@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import imageCompression from "browser-image-compression";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,9 @@ export default function ProfileClient() {
   // 名前の編集値
   const [nameValue, setNameValue] = useState("");
   const [usernameValue, setUsernameValue] = useState("");
+  
+  // 画像圧縮中の状態
+  const [isCompressing, setIsCompressing] = useState(false);
 
   useEffect(() => {
     if (profile?.name) {
@@ -64,24 +68,51 @@ export default function ProfileClient() {
     }
   }, [profile?.name, profile?.username]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // ファイルサイズチェック（2MB以下）
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("ファイルサイズは2MB以下にしてください");
-        return;
+    if (!file) return;
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith("image/")) {
+      toast.error("画像ファイルを選択してください");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
-      // 画像ファイルかチェック
-      if (!file.type.startsWith("image/")) {
-        toast.error("画像ファイルを選択してください");
-        return;
-      }
-      uploadAvatarMutation.mutate(file);
+      return;
     }
-    // inputをリセット
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+
+    try {
+      setIsCompressing(true);
+      toast.info("画像を最適化しています...");
+
+      // 圧縮オプション
+      const options = {
+        maxSizeMB: 5,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+        fileType: 'image/jpeg' as const,
+      };
+
+      // 画像を圧縮
+      const compressedFile = await imageCompression(file, options);
+
+      // 圧縮後も5MBを超える場合はエラー
+      if (compressedFile.size > 5 * 1024 * 1024) {
+        toast.error("画像サイズが大きすぎます。別の画像を選択してください。");
+        return;
+      }
+
+      // アップロード
+      uploadAvatarMutation.mutate(compressedFile);
+    } catch (error) {
+      console.error("画像圧縮エラー:", error);
+      toast.error("画像の処理中にエラーが発生しました");
+    } finally {
+      setIsCompressing(false);
+      // inputをリセット
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -179,7 +210,7 @@ export default function ProfileClient() {
       .slice(0, 2);
   };
 
-  const isAvatarLoading = uploadAvatarMutation.isPending || removeAvatarMutation.isPending;
+  const isAvatarLoading = uploadAvatarMutation.isPending || removeAvatarMutation.isPending || isCompressing;
 
   return (
     <div className="w-full max-w-3xl space-y-10">
