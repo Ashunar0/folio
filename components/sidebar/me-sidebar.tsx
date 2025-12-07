@@ -20,11 +20,6 @@ export const meSidebarItems = [
     icon: IconUser,
   },
   {
-    title: "Account",
-    url: "/me/account",
-    icon: IconKey,
-  },
-  {
     title: "Appearance",
     url: "/me/appearance",
     icon: IconPalette,
