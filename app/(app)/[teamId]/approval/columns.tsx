@@ -13,18 +13,13 @@ import { IconDotsVertical, IconEye } from "@/lib/icons";
 import { Link2 } from "lucide-react";
 import { Expense } from "@/lib/schemas";
 
-type ApprovalTableMeta = {
-  onEdit?: (expense: Expense) => void;
-  onReceiptPreview?: (url: string) => void;
-};
-
 export const approvalColumns: ColumnDef<Expense>[] = [
   // === Actions（承認/却下）===========================================
   {
     id: "actions",
     cell: ({ table, row }) => {
       const expense = row.original;
-      const meta = table.options.meta as ApprovalTableMeta | undefined;
+      const meta = table.options.meta as any;
 
       return (
         <DropdownMenu>
@@ -112,7 +107,7 @@ export const approvalColumns: ColumnDef<Expense>[] = [
     header: "Receipt",
     cell: ({ row, table }) => {
       const url = row.original.receiptUrl;
-      const meta = table.options.meta as ApprovalTableMeta | undefined;
+      const meta = table.options.meta as any;
       return url ? (
         <Button
           variant="ghost"
