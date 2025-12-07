@@ -22,152 +22,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/providers/auth-provider";
 import { useTeams } from "@/providers/team-provider";
-import { useSupabase } from "@/providers/supabase-provider";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-type Profile = {
-  id: string;
-  name: string;
-  email: string;
-  avatar_url: string | null;
-  username?: string | null;
-  created_at: string;
-};
+import {
+  useProfile,
+  useUpdateProfile,
+  useUploadAvatar,
+  useRemoveAvatar,
+  useTeamMemberCounts,
+} from "@/lib/api/profile";
 
 export default function ProfileClient() {
-  const { user: authUser, authLoading } = useAuth();
+  const { authLoading } = useAuth();
   const { teams } = useTeams();
-  const supabase = useSupabase();
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // プロフィール取得
-  const { data: profile, isLoading: profileLoading } = useQuery({
-    queryKey: ["profile", authUser?.id],
-    enabled: Boolean(authUser?.id),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", authUser!.id)
-        .single();
-      if (error) throw error;
-      return data as Profile;
-    },
-  });
+  const { data: profile, isLoading: profileLoading } = useProfile();
 
-  // 各チームのメンバー数を取得
-  const { data: teamMemberCounts } = useQuery({
-    queryKey: ["team-member-counts", teams.map((t) => t.id)],
-    enabled: teams.length > 0,
-    queryFn: async () => {
-      const counts: Record<string, number> = {};
-      for (const team of teams) {
-        const { count } = await supabase
-          .from("team_users")
-          .select("*", { count: "exact", head: true })
-          .eq("team_id", team.id);
-        counts[team.id] = count ?? 0;
-      }
-      return counts;
-    },
-  });
+  // チームメンバー数取得
+  const { data: teamMemberCounts } = useTeamMemberCounts();
 
   // プロフィール更新
-  const updateProfileMutation = useMutation({
-    mutationFn: async (updates: { name?: string; username?: string | null; avatar_url?: string | null }) => {
-      if (!authUser?.id) throw new Error("ログインが必要です");
-      const { error } = await supabase
-        .from("profiles")
-        .update(updates)
-        .eq("id", authUser.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile", authUser?.id] });
-      toast.success("プロフィールを更新しました");
-    },
-    onError: () => {
-      toast.error("プロフィールの更新に失敗しました");
-    },
-  });
+  const updateProfileMutation = useUpdateProfile();
 
   // アバターアップロード
-  const uploadAvatarMutation = useMutation({
-    mutationFn: async (file: File) => {
-      if (!authUser?.id) throw new Error("ログインが必要です");
-
-      const extension = file.name.split(".").pop() ?? "jpg";
-      const path = `${authUser.id}/${crypto.randomUUID()}.${extension}`;
-
-      // 古いアバターがあれば削除
-      if (profile?.avatar_url) {
-        const oldPath = profile.avatar_url.split("/").slice(-2).join("/");
-        await supabase.storage.from("avatars").remove([oldPath]);
-      }
-
-      // 新しいアバターをアップロード
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(path, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.type || undefined,
-        });
-
-      if (uploadError) throw uploadError;
-
-      // 公開URLを取得
-      const { data: urlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(path);
-
-      // プロフィールを更新
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: urlData.publicUrl })
-        .eq("id", authUser.id);
-
-      if (updateError) throw updateError;
-
-      return urlData.publicUrl;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile", authUser?.id] });
-      toast.success("プロフィール画像を更新しました");
-    },
-    onError: (error) => {
-      console.error("Avatar upload error:", error);
-      toast.error("画像のアップロードに失敗しました");
-    },
-  });
+  const uploadAvatarMutation = useUploadAvatar();
 
   // アバター削除
-  const removeAvatarMutation = useMutation({
-    mutationFn: async () => {
-      if (!authUser?.id) throw new Error("ログインが必要です");
-
-      if (profile?.avatar_url) {
-        const path = profile.avatar_url.split("/").slice(-2).join("/");
-        await supabase.storage.from("avatars").remove([path]);
-      }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ avatar_url: null })
-        .eq("id", authUser.id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile", authUser?.id] });
-      toast.success("プロフィール画像を削除しました");
-    },
-    onError: () => {
-      toast.error("画像の削除に失敗しました");
-    },
-  });
+  const removeAvatarMutation = useRemoveAvatar();
 
   // 名前の編集値
   const [nameValue, setNameValue] = useState("");
@@ -370,7 +252,7 @@ export default function ProfileClient() {
                 </div>
               </div>
               <div className="text-muted-foreground text-sm">
-                {profile?.email ?? authUser?.email ?? "-"}
+                {profile?.email ?? "-"}
               </div>
             </div>
             <Separator />
