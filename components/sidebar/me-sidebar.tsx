@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { IconUser, IconKey, IconPalette, IconBell } from "@/lib/icons";
+import { IconUser, IconKey, IconPalette, IconBell, IconShield } from "@/lib/icons";
 import { ChevronLeft } from "lucide-react";
 
 import { NavGroup } from "@/components/sidebar/nav-group";
@@ -28,6 +28,11 @@ export const meSidebarItems = [
     title: "Notifications",
     url: "/me/notifications",
     icon: IconBell,
+  },
+  {
+    title: "Security",
+    url: "/me/security",
+    icon: IconShield,
   },
 ];
 

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Palette, Sun, Moon, Monitor, Check } from "lucide-react";
+import { Palette, Sun, Moon, Monitor, Check, Globe } from "lucide-react";
 import { useState } from "react";
 import {
   Select,
@@ -44,11 +44,17 @@ export default function AppearanceClient() {
     { id: "large", name: "Large" },
   ];
 
+  const languages = [
+    { id: "ja", name: "日本語" },
+    { id: "en", name: "English" },
+  ];
+
   const [selectedTheme, setSelectedTheme] = useState("Neutral");
   const [colorMode, setColorMode] = useState("system");
   const [reduceMotion, setReduceMotion] = useState(false);
   const [defaultHomeView, setDefaultHomeView] = useState("dashboard");
   const [fontSize, setFontSize] = useState("default");
+  const [language, setLanguage] = useState("ja");
 
   return (
     <div className="w-full max-w-3xl space-y-10">
@@ -255,6 +261,39 @@ export default function AppearanceClient() {
                 checked={reduceMotion}
                 onCheckedChange={setReduceMotion}
               />
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Section 4: Language & Region */}
+      <section className="space-y-4">
+        <h2 className="text-lg flex items-center gap-2">
+          <Globe size={18} />
+          Language & Region
+        </h2>
+        <Card className="py-0 rounded-md">
+          <CardContent className="p-0">
+            {/* Language */}
+            <div className="flex items-center justify-between py-4 px-6">
+              <div className="space-y-0.5">
+                <div className="text-sm">Language</div>
+                <div className="text-xs text-muted-foreground">
+                  Select your preferred language
+                </div>
+              </div>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="h-8 w-[180px]">
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang.id} value={lang.id}>
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>

@@ -1,18 +1,17 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
-  LogOut,
   Pencil,
   Upload,
   Trash,
   UserRound,
   UsersRound,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RoleBadge } from "@/components/role-badge";
 import { User as UserType } from "@/lib/schemas";
 import {
@@ -196,17 +195,6 @@ export default function ProfileClient() {
             ))}
           </CardContent>
         </Card>
-      </section>
-
-      {/* Section 6: ログアウト */}
-      <section className="flex justify-start pt-4 pb-10">
-        <Button
-          variant="outline"
-          className="cursor-pointer gap-2 px-8 border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
-        >
-          <LogOut size={16} />
-          Log out
-        </Button>
       </section>
     </div>
   );
