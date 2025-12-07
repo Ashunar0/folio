@@ -95,7 +95,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Link href="/me" className="flex items-center gap-2">
+                <Link href="/me/profile" className="flex items-center gap-2">
                   <IconSettings />
                   Settings
                 </Link>
