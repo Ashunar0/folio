@@ -19,6 +19,7 @@ type Team = {
   id: string;
   name: string;
   role: TeamRole;
+  icon: string | null;
 };
 
 type TeamContextValue = {
@@ -89,7 +90,7 @@ export function TeamProvider({
     queryFn: async () => {
       const { data, error } = await supabase
         .from("team_users")
-        .select("team_id, role, teams(name)")
+        .select("team_id, role, teams(name, icon)")
         .eq("user_id", user!.id);
 
       if (error) throw error;
@@ -97,6 +98,8 @@ export function TeamProvider({
         id: row.team_id,
         name: (row as { teams?: { name?: string | null } } | null)?.teams
           ?.name ?? "",
+        icon: (row as { teams?: { icon?: string | null } } | null)?.teams
+          ?.icon ?? null,
         role: row.role as Team["role"],
       }));
     },

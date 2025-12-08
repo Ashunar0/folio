@@ -20,6 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTeam } from "@/providers/team-provider";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ export function TeamSwitcher() {
     id: string;
     name: string;
     role: string;
+    icon: string | null;
   } | null>(null);
   const [isJoinDialogOpen, setIsJoinDialogOpen] = React.useState(false);
   const [inviteInput, setInviteInput] = React.useState("");
@@ -102,8 +104,13 @@ export function TeamSwitcher() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg text-sm font-semibold">
-                {displayTeam.name.slice(0, 1).toUpperCase()}
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={displayTeam.icon ?? undefined} alt={displayTeam.name} />
+                  <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    {displayTeam.name.slice(0, 1).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="truncate font-bold">{displayTeam.name}</span>
@@ -134,7 +141,12 @@ export function TeamSwitcher() {
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border text-xs font-semibold">
-                  {team.name.slice(0, 1).toUpperCase()}
+                  <Avatar className="h-6 w-6 rounded-md">
+                    <AvatarImage src={team.icon ?? undefined} alt={team.name} />
+                    <AvatarFallback className="rounded-md">
+                      {team.name.slice(0, 1).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="truncate">{team.name}</span>

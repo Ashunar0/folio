@@ -66,6 +66,7 @@ import {
   useUploadTeamIcon,
   useRemoveTeamIcon,
 } from "@/lib/api/team-settings";
+import { useTeam } from "@/providers/team-provider";
 
 type InviteRow = {
   id: string;
@@ -92,7 +93,8 @@ export default function TeamSettingsClient({
   
   // Fetch team info with owner profile
   const { data: team } = useTeamSettings(teamId);
-  
+  const { currentTeamRole } = useTeam();
+
   // Mutations
   const updateTeamMutation = useUpdateTeamSettings(teamId);
   const uploadIconMutation = useUploadTeamIcon(teamId);
@@ -174,10 +176,10 @@ export default function TeamSettingsClient({
       .slice(0, 2);
   };
 
-  // Mock: 実際にはログインユーザーの権限を取得
-  const userRole = "admin"; // or "manager", "member", "viewer"
-  const canInvite = ["admin", "manager"].includes(userRole);
-  const canRevokeInvite = userRole === "admin";
+  // Permissions
+  const canEdit = ["admin", "manager"].includes(currentTeamRole ?? "");
+  const canInvite = ["admin", "manager"].includes(currentTeamRole ?? "");
+  const canRevokeInvite = currentTeamRole === "admin";
 
   // Dialog states
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -261,7 +263,7 @@ export default function TeamSettingsClient({
       userName: selectedMember.name,
       oldRole: selectedMember.role,
       newRole: newRole,
-      changedBy: userRole,
+      changedBy: currentTeamRole,
       timestamp: new Date().toISOString(),
     });
     setIsRoleChangeDialogOpen(false);
@@ -315,7 +317,7 @@ export default function TeamSettingsClient({
                 </div>
               </div>
               <DropdownMenu>
-                <DropdownMenuTrigger className="focus:outline-none" disabled={isIconLoading}>
+                <DropdownMenuTrigger className="focus:outline-none" disabled={!canEdit || isIconLoading}>
                   <div className="relative">
                     <Avatar className="h-10 w-10 rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
                       <AvatarImage src={team.icon ?? undefined} alt={team.name} />
@@ -366,6 +368,7 @@ export default function TeamSettingsClient({
                       updateTeamMutation.mutate({ name: nameValue.trim() });
                     }
                   }}
+                  disabled={!canEdit}
                   className="h-9 text-sm"
                   placeholder="Enter team name"
                 />
@@ -638,7 +641,7 @@ export default function TeamSettingsClient({
               </div>
             )} */}
 
-            {userRole === "admin" && <Separator />}
+            {currentTeamRole === "admin" && <Separator />}
           </CardContent>
         </Card>
       </section>
