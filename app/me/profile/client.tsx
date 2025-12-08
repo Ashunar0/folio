@@ -362,7 +362,7 @@ export default function ProfileClient() {
                     <div className="flex items-center gap-4">
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarImage
-                          src={`https://avatar.vercel.sh/${encodeURIComponent(team.name)}`}
+                          src={team.icon ?? undefined}
                           alt={team.name}
                         />
                         <AvatarFallback className="rounded-lg">
