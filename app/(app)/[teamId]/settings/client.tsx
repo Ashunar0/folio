@@ -15,12 +15,14 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { createInvite, revokeInvite } from "@/lib/actions/invites";
 import { toast } from "sonner";
+import imageCompression from "browser-image-compression";
 import {
   AlertTriangle,
   Copy,
   Database,
   Download,
   Link as LinkIcon,
+  Loader2,
   Settings,
   Shield,
   Trash,
@@ -54,10 +56,16 @@ import {
 //   AlertDialogTitle,
 // } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { RoleBadge } from "@/components/role-badge";
 import { User } from "@/lib/schemas";
 import { Switch } from "@/components/ui/switch";
+import {
+  useTeamSettings,
+  useUpdateTeamSettings,
+  useUploadTeamIcon,
+  useRemoveTeamIcon,
+} from "@/lib/api/team-settings";
 
 type InviteRow = {
   id: string;
@@ -80,14 +88,91 @@ export default function TeamSettingsClient({
   teamId,
   initialInvitations = [],
 }: SettingsClientProps) {
-  // Mock Data
-  const team = {
-    name: "Acme Corp",
-    id: "team_123456789",
-    icon: "https://avatar.vercel.sh/acme",
-    description: "Main workspace for Acme Corporation financial management.",
-  };
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Fetch team info with owner profile
+  const { data: team } = useTeamSettings(teamId);
+  
+  // Mutations
+  const updateTeamMutation = useUpdateTeamSettings(teamId);
+  const uploadIconMutation = useUploadTeamIcon(teamId);
+  const removeIconMutation = useRemoveTeamIcon(teamId);
+
   const [invitations, setInvitations] = useState(initialInvitations);
+  
+  // チーム名の編集値
+  const [nameValue, setNameValue] = useState("");
+  
+  // 画像圧縮中の状態
+  const [isCompressing, setIsCompressing] = useState(false);
+  
+  useEffect(() => {
+    if (team?.name) {
+      setNameValue(team.name);
+    }
+  }, [team?.name]);
+  
+  // ファイル変更ハンドラ
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith("image/")) {
+      toast.error("画像ファイルを選択してください");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    try {
+      setIsCompressing(true);
+      toast.info("画像を最適化しています...");
+
+      // 圧縮オプション
+      const options = {
+        maxSizeMB: 5,
+        maxWidthOrHeight: 512,
+        useWebWorker: true,
+        fileType: 'image/jpeg' as const,
+      };
+
+      // 画像を圧縮
+      const compressedFile = await imageCompression(file, options);
+
+      // 圧縮後も5MBを超える場合はエラー
+      if (compressedFile.size > 5 * 1024 * 1024) {
+        toast.error("画像サイズが大きすぎます。別の画像を選択してください。");
+        return;
+      }
+
+      // アップロード
+      uploadIconMutation.mutate(compressedFile);
+    } catch (error) {
+      console.error("画像圧縮エラー:", error);
+      toast.error("画像の処理中にエラーが発生しました");
+    } finally {
+      setIsCompressing(false);
+      // inputをリセット
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+  
+  // アイコンのローディング状態
+  const isIconLoading = uploadIconMutation.isPending || removeIconMutation.isPending || isCompressing;
+  
+  // アバターのイニシャルを取得
+  const getInitials = (name: string) => {
+    return name
+      .split(/\s+/)
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   // Mock: 実際にはログインユーザーの権限を取得
   const userRole = "admin"; // or "manager", "member", "viewer"
@@ -199,7 +284,20 @@ export default function TeamSettingsClient({
   return (
     <div className="w-full max-w-3xl space-y-10 py-8 mx-auto">
       <h1 className="text-xl font-bold tracking-tight">Team Settings</h1>
+      
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
+      {!team ? (
+        <div className="text-center py-8">Loading team information...</div>
+      ) : (
+        <>
       {/* General */}
       <section className="space-y-4">
         <h2 className="text-lg flex items-center gap-2">
@@ -217,21 +315,35 @@ export default function TeamSettingsClient({
                 </div>
               </div>
               <DropdownMenu>
-                <DropdownMenuTrigger className="focus:outline-none">
-                  <Avatar className="h-10 w-10 rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
-                    <AvatarImage src={team.icon} alt={team.name} />
-                    <AvatarFallback className="rounded-lg">AC</AvatarFallback>
-                  </Avatar>
+                <DropdownMenuTrigger className="focus:outline-none" disabled={isIconLoading}>
+                  <div className="relative">
+                    <Avatar className="h-10 w-10 rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
+                      <AvatarImage src={team.icon ?? undefined} alt={team.name} />
+                      <AvatarFallback className="rounded-lg">
+                        {getInitials(team.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    {isIconLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                      </div>
+                    )}
+                  </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                     <Upload className="mr-2 h-4 w-4" />
                     <span>Upload new picture</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                    <Trash className="mr-2 h-4 w-4" />
-                    <span>Remove picture</span>
-                  </DropdownMenuItem>
+                  {team.icon && (
+                    <DropdownMenuItem
+                      className="text-red-600 focus:text-red-600"
+                      onClick={() => removeIconMutation.mutate()}
+                    >
+                      <Trash className="mr-2 h-4 w-4" />
+                      <span>Remove picture</span>
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -246,7 +358,17 @@ export default function TeamSettingsClient({
                 </div>
               </div>
               <div className="w-full sm:w-1/3">
-                <Input defaultValue={team.name} className="h-9 text-sm" />
+                <Input
+                  value={nameValue}
+                  onChange={(e) => setNameValue(e.target.value)}
+                  onBlur={() => {
+                    if (nameValue.trim() && nameValue !== team.name) {
+                      updateTeamMutation.mutate({ name: nameValue.trim() });
+                    }
+                  }}
+                  className="h-9 text-sm"
+                  placeholder="Enter team name"
+                />
               </div>
             </div>
             <Separator />
@@ -263,42 +385,22 @@ export default function TeamSettingsClient({
                 <code className="bg-muted px-2 py-1 rounded text-xs">
                   {team.id}
                 </code>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <span className="sr-only">Copy ID</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-copy"
-                  >
-                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                  </svg>
-                </Button>
               </div>
             </div>
             <Separator />
 
-            {/* Description */}
+            {/* Owner */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between py-4 px-6 gap-4 sm:gap-0">
               <div className="space-y-0.5">
-                <div className="text-sm">Description</div>
+                <div className="text-sm">Owner</div>
                 <div className="text-xs text-muted-foreground">
-                  Brief description of your team
+                  Team owner
                 </div>
               </div>
-              <div className="w-full sm:w-2/3">
-                <Input
-                  defaultValue={team.description}
-                  className="h-9 text-sm"
-                />
-              </div>
+                <div className="space-y-1">
+                  <div className="text-sm font-medium">{team.owner.name}</div>
+                  <div className="text-xs text-muted-foreground">{team.owner.email}</div>
+                </div>
             </div>
           </CardContent>
         </Card>
@@ -862,6 +964,8 @@ export default function TeamSettingsClient({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog> */}
+      </>
+      )}
     </div>
   );
 }
