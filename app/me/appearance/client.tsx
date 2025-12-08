@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Palette, Sun, Moon, Monitor, Check, Globe } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import {
   Select,
   SelectContent,
@@ -50,11 +51,17 @@ export default function AppearanceClient() {
   ];
 
   const [selectedTheme, setSelectedTheme] = useState("Neutral");
-  const [colorMode, setColorMode] = useState("system");
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [defaultHomeView, setDefaultHomeView] = useState("dashboard");
   const [fontSize, setFontSize] = useState("default");
   const [language, setLanguage] = useState("ja");
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="w-full max-w-3xl space-y-10">
@@ -77,11 +84,11 @@ export default function AppearanceClient() {
               <div className="grid grid-cols-3 gap-3">
                 {colorModes.map((mode) => {
                   const Icon = mode.icon;
-                  const isSelected = colorMode === mode.id;
+                  const isSelected = mounted && theme === mode.id;
                   return (
                     <button
                       key={mode.id}
-                      onClick={() => setColorMode(mode.id)}
+                      onClick={() => setTheme(mode.id)}
                       className={cn(
                         "flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer",
                         isSelected
