@@ -17,13 +17,17 @@ import { cn } from "@/lib/utils";
 
 export default function AppearanceClient() {
   const themes = [
-    { name: "Neutral", color: "#0F172A" },
-    { name: "Blue", color: "#3B82F6" },
-    { name: "Emerald", color: "#10B981" },
-    { name: "Amber", color: "#F59E0B" },
-    { name: "Purple", color: "#8B5CF6" },
-    { name: "Rose", color: "#F43F5E" },
-    { name: "Slate", color: "#64748B" },
+    { id: "neutral", name: "Neutral", color: "#0F172A" },
+    { id: "blue", name: "Blue", color: "#3B82F6" },
+    { id: "emerald", name: "Emerald", color: "#10B981" },
+    { id: "teal", name: "Teal", color: "#14B8A6" },
+    { id: "cyan", name: "Cyan", color: "#06B6D4" },
+    { id: "lime", name: "Lime", color: "#84CC16" },
+    { id: "amber", name: "Amber", color: "#F59E0B" },
+    { id: "purple", name: "Purple", color: "#8B5CF6" },
+    { id: "rose", name: "Rose", color: "#F43F5E" },
+    { id: "slate", name: "Slate", color: "#64748B" },
+    { id: "stone", name: "Stone", color: "#78716C" },
   ];
 
   const colorModes = [
@@ -50,18 +54,35 @@ export default function AppearanceClient() {
     { id: "en", name: "English" },
   ];
 
-  const [selectedTheme, setSelectedTheme] = useState("Neutral");
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [accentColor, setAccentColor] = useState("neutral");
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [defaultHomeView, setDefaultHomeView] = useState("dashboard");
   const [fontSize, setFontSize] = useState("default");
   const [language, setLanguage] = useState("ja");
 
-  // Prevent hydration mismatch
+  // Prevent hydration mismatch and load saved accent color
   useEffect(() => {
     setMounted(true);
+    const savedAccent = localStorage.getItem("accent-color");
+    if (savedAccent) {
+      setAccentColor(savedAccent);
+      document.documentElement.setAttribute("data-accent", savedAccent);
+    }
   }, []);
+
+  // Apply accent color change
+  const handleAccentChange = (newAccent: string) => {
+    setAccentColor(newAccent);
+    if (newAccent === "neutral") {
+      document.documentElement.removeAttribute("data-accent");
+      localStorage.removeItem("accent-color");
+    } else {
+      document.documentElement.setAttribute("data-accent", newAccent);
+      localStorage.setItem("accent-color", newAccent);
+    }
+  };
 
   return (
     <div className="w-full max-w-3xl space-y-10">
@@ -142,19 +163,19 @@ export default function AppearanceClient() {
                   Select your preferred accent color
                 </div>
               </div>
-              <Select value={selectedTheme} onValueChange={setSelectedTheme}>
+              <Select value={accentColor} onValueChange={handleAccentChange}>
                 <SelectTrigger className="h-8 w-[180px]">
                   <SelectValue placeholder="Select theme" />
                 </SelectTrigger>
                 <SelectContent>
-                  {themes.map((theme) => (
-                    <SelectItem key={theme.name} value={theme.name}>
+                  {themes.map((themeItem) => (
+                    <SelectItem key={themeItem.id} value={themeItem.id}>
                       <div className="flex items-center gap-2">
                         <div
                           className="h-3 w-3 rounded-full border border-gray-200"
-                          style={{ backgroundColor: theme.color }}
+                          style={{ backgroundColor: themeItem.color }}
                         />
-                        <span>{theme.name}</span>
+                        <span>{themeItem.name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -172,23 +193,23 @@ export default function AppearanceClient() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-3">
-                {themes.map((theme) => {
-                  const isSelected = selectedTheme === theme.name;
+                {themes.map((themeItem) => {
+                  const isSelected = mounted && accentColor === themeItem.id;
                   return (
                     <button
-                      key={theme.name}
-                      onClick={() => setSelectedTheme(theme.name)}
+                      key={themeItem.id}
+                      onClick={() => handleAccentChange(themeItem.id)}
                       className={cn(
                         "h-5 w-5 rounded-full transition-all flex items-center justify-center cursor-pointer",
                         !isSelected && "hover:scale-110"
                       )}
                       style={{
-                        backgroundColor: theme.color,
+                        backgroundColor: themeItem.color,
                         boxShadow: isSelected
-                          ? `0 0 0 2px var(--background), 0 0 0 4px ${theme.color}`
+                          ? `0 0 0 2px var(--background), 0 0 0 4px ${themeItem.color}`
                           : undefined,
                       }}
-                      title={theme.name}
+                      title={themeItem.name}
                     >
                       {isSelected && (
                         <Check size={16} className="text-white drop-shadow-md" />
