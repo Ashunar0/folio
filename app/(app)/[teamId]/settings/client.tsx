@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { createInvite, revokeInvite } from "@/lib/actions/invites";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
+import { cropToSquare } from "@/lib/utils/image";
 import {
   AlertTriangle,
   Copy,
@@ -130,7 +131,9 @@ export default function TeamSettingsClient({
 
     try {
       setIsCompressing(true);
+      // 画像を正方形にクロップ
       toast.info("画像を最適化しています...");
+      const croppedFile = await cropToSquare(file, 512);
 
       // 圧縮オプション
       const options = {
@@ -141,7 +144,7 @@ export default function TeamSettingsClient({
       };
 
       // 画像を圧縮
-      const compressedFile = await imageCompression(file, options);
+      const compressedFile = await imageCompression(croppedFile, options);
 
       // 圧縮後も5MBを超える場合はエラー
       if (compressedFile.size > 5 * 1024 * 1024) {

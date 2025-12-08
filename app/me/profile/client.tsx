@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import imageCompression from "browser-image-compression";
+import { cropToSquare } from "@/lib/utils/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -83,7 +84,9 @@ export default function ProfileClient() {
 
     try {
       setIsCompressing(true);
+      // 画像を正方形にクロップ
       toast.info("画像を最適化しています...");
+      const croppedFile = await cropToSquare(file, 1024);
 
       // 圧縮オプション
       const options = {
@@ -94,7 +97,7 @@ export default function ProfileClient() {
       };
 
       // 画像を圧縮
-      const compressedFile = await imageCompression(file, options);
+      const compressedFile = await imageCompression(croppedFile, options);
 
       // 圧縮後も5MBを超える場合はエラー
       if (compressedFile.size > 5 * 1024 * 1024) {
