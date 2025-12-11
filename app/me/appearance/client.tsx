@@ -54,34 +54,31 @@ export default function AppearanceClient() {
     { id: "en", name: "English" },
   ];
 
-  const [accentColor, setAccentColor] = useState("neutral");
+  const [accentColor, setAccentColor] = useState(() => {
+    // Initialize from localStorage when available to avoid extra renders after mount
+    if (typeof window === "undefined") return "neutral";
+    return localStorage.getItem("accent-color") ?? "neutral";
+  });
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [defaultHomeView, setDefaultHomeView] = useState("dashboard");
   const [fontSize, setFontSize] = useState("default");
   const [language, setLanguage] = useState("ja");
 
-  // Prevent hydration mismatch and load saved accent color
+  // Sync accent color changes to DOM/localStorage without extra state updates
   useEffect(() => {
-    setMounted(true);
-    const savedAccent = localStorage.getItem("accent-color");
-    if (savedAccent) {
-      setAccentColor(savedAccent);
-      document.documentElement.setAttribute("data-accent", savedAccent);
+    if (accentColor === "neutral") {
+      document.documentElement.removeAttribute("data-accent");
+      localStorage.removeItem("accent-color");
+      return;
     }
-  }, []);
+    document.documentElement.setAttribute("data-accent", accentColor);
+    localStorage.setItem("accent-color", accentColor);
+  }, [accentColor]);
 
   // Apply accent color change
   const handleAccentChange = (newAccent: string) => {
     setAccentColor(newAccent);
-    if (newAccent === "neutral") {
-      document.documentElement.removeAttribute("data-accent");
-      localStorage.removeItem("accent-color");
-    } else {
-      document.documentElement.setAttribute("data-accent", newAccent);
-      localStorage.setItem("accent-color", newAccent);
-    }
   };
 
   return (
@@ -105,7 +102,7 @@ export default function AppearanceClient() {
               <div className="grid grid-cols-3 gap-3">
                 {colorModes.map((mode) => {
                   const Icon = mode.icon;
-                  const isSelected = mounted && theme === mode.id;
+                  const isSelected = theme === mode.id;
                   return (
                     <button
                       key={mode.id}
@@ -194,7 +191,7 @@ export default function AppearanceClient() {
               </div>
               <div className="flex flex-wrap gap-3">
                 {themes.map((themeItem) => {
-                  const isSelected = mounted && accentColor === themeItem.id;
+                  const isSelected = accentColor === themeItem.id;
                   return (
                     <button
                       key={themeItem.id}
